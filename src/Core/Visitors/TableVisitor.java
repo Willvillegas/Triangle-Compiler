@@ -177,12 +177,16 @@ public class TableVisitor implements Visitor {
    * VisitForCommand
    * Extended Triangle Compiler
    * Visita el comando for para generar la tabla de variables y se visualize por medio del IDE Triangle
-   * @param ast
-   * @param o
-   * @return 
+   * @param ast -> Recorre el arbol sintactico para generar la tabla del comando for
+   * @param o -> null (por ser un comando)
+   * @return null
    */
   @Override
     public Object visitForCommand(ForCommand ast, Object o) {
+        ast.Vn.visit(this, null);
+        ast.E1.visit(this, null);
+        ast.E2.visit(this, null);
+        ast.C.visit(this, null);
         return null;
     }
   // </editor-fold>

@@ -17,6 +17,7 @@
  *          For    ::=  for V-name := Expression to Expression  
                 [by Integer-Literal]  
               do  single-Command 
+ * @author Wifredo Villegas Mendez
  */
 
 package Triangle.AbstractSyntaxTrees;

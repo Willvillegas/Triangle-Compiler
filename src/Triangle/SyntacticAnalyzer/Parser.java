@@ -394,6 +394,11 @@ public class Parser {
 
     return commandAST;
   }
+  /**
+   * Genera el arbol sintactico para el comando for, basado en los tokens que contiene el archivo analizado.
+   * @return el arbol sintactico del forCommand
+   * @throws SyntaxError 
+   */
   Command parseForCommand() throws SyntaxError{
       Command commandAST = null; //Case error
       SourcePosition commandPos = new SourcePosition();

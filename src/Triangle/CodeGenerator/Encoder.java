@@ -218,6 +218,7 @@ public final class Encoder implements Visitor {
     /**
      * VisitForCommand
      * Extended Triangle Compiler
+     * Dado un arbol sintactico, genera el codigo para el TAM del forCommand
      * @param ast -> arbol sintactico del forCommand
      * @param o -> los frames (por defecto en null)
      * @return null (por ser un commando)

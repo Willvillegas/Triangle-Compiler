@@ -192,10 +192,12 @@ public final class Checker implements Visitor {
         return null;
     }
     /**
-     * 
-     * @param ast
-     * @param o
-     * @return 
+     * VisitForCommand 
+     * Extended Triangle Compiler
+     * Dado un arbol sintactico, analiza de manera contextual el comando for 
+     * @param ast -> arbol sintactico del for
+     * @param o -> null (por ser un comando)
+     * @return null (por defecto)
      */
    @Override
     public Object visitForCommand(ForCommand ast, Object o) {

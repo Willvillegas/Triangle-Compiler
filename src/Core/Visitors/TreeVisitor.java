@@ -21,6 +21,7 @@ import Triangle.AbstractSyntaxTrees.ConstActualParameter;
 import Triangle.AbstractSyntaxTrees.ConstDeclaration;
 import Triangle.AbstractSyntaxTrees.ConstFormalParameter;
 import Triangle.AbstractSyntaxTrees.DotVname;
+import Triangle.AbstractSyntaxTrees.DoWhileCommand;
 import Triangle.AbstractSyntaxTrees.EmptyActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.EmptyCommand;
 import Triangle.AbstractSyntaxTrees.EmptyExpression;
@@ -127,6 +128,18 @@ public class TreeVisitor implements Visitor {
     @Override
     public Object visitRepeatCommand(RepeatCommand ast, Object o) {
         return(createBinary("Repeat Command", ast.C, ast.E));
+    }
+    /**
+     * VisitRepeatCommand
+     * Extended Triangle Compiler
+     * Visita el comando repeat para generar el ast por medio del IDE Compiler
+     * @param ast -> Arbol sintactico a recorrer
+     * @param o - null por defecto
+     * @return null
+     */
+    @Override
+    public Object visitDoWhileCommand(DoWhileCommand ast, Object o) {
+        return(createBinary("DoWhile Command", ast.C, ast.E));
     }
     // </editor-fold>
     

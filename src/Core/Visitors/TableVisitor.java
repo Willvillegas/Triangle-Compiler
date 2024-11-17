@@ -21,6 +21,7 @@ import Triangle.AbstractSyntaxTrees.ConstActualParameter;
 import Triangle.AbstractSyntaxTrees.ConstDeclaration;
 import Triangle.AbstractSyntaxTrees.ConstFormalParameter;
 import Triangle.AbstractSyntaxTrees.DotVname;
+import Triangle.AbstractSyntaxTrees.DoWhileCommand;
 import Triangle.AbstractSyntaxTrees.EmptyActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.EmptyCommand;
 import Triangle.AbstractSyntaxTrees.EmptyExpression;
@@ -151,6 +152,21 @@ public class TableVisitor implements Visitor {
    */
   @Override
   public Object visitRepeatCommand(RepeatCommand ast, Object o) {
+      ast.C.visit(this, null);
+      ast.E.visit(this, null);     
+      
+      return(null);
+  }
+  /**
+   * VisitRepeatCommand
+   * Extended Triangle Compiler
+   * Visita el comando repeat para generar la tabla de variables y se visualice por medio del IDE Triangle
+   * @param ast -> Arbol sintactico generado por el compilador
+   * @param o -> null por defecto, debido a que es un comando
+   * @return null
+   */
+  @Override
+  public Object visitDoWhileCommand(DoWhileCommand ast, Object o) {
       ast.C.visit(this, null);
       ast.E.visit(this, null);     
       

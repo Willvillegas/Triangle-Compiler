@@ -33,6 +33,7 @@ import Triangle.AbstractSyntaxTrees.ConstDeclaration;
 import Triangle.AbstractSyntaxTrees.ConstFormalParameter;
 import Triangle.AbstractSyntaxTrees.Declaration;
 import Triangle.AbstractSyntaxTrees.DotVname;
+import Triangle.AbstractSyntaxTrees.DoWhileCommand;
 import Triangle.AbstractSyntaxTrees.EmptyActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.EmptyCommand;
 import Triangle.AbstractSyntaxTrees.EmptyExpression;
@@ -166,6 +167,23 @@ public final class Checker implements Visitor {
    */
   @Override
     public Object visitRepeatCommand(RepeatCommand ast, Object o) {
+        ast.C.visit(this, null);
+        TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
+        if (!eType.equals(StdEnvironment.booleanType))
+            reporter.reportError("Boolean expression expected here", "", ast.E.position);
+        return null;
+    }
+   /**
+   * VisitDoWhileCommand
+   * Extended Triangle Compiler
+   * Realiza la visita del analisis contextual del comando DoWhile
+   * su retorno es null debido a que es un comando.
+   * @param ast -> El arbol sintactico del DoWhile
+   * @param o -> Objeto que por defecto es null
+   * @return null
+   */
+  @Override
+    public Object visitDoWhileCommand(DoWhileCommand ast, Object o) {
         ast.C.visit(this, null);
         TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
         if (!eType.equals(StdEnvironment.booleanType))

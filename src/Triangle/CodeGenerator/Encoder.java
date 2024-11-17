@@ -41,6 +41,7 @@ import Triangle.AbstractSyntaxTrees.ConstDeclaration;
 import Triangle.AbstractSyntaxTrees.ConstFormalParameter;
 import Triangle.AbstractSyntaxTrees.Declaration;
 import Triangle.AbstractSyntaxTrees.DotVname;
+import Triangle.AbstractSyntaxTrees.DoWhileCommand;
 import Triangle.AbstractSyntaxTrees.EmptyActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.EmptyCommand;
 import Triangle.AbstractSyntaxTrees.EmptyExpression;
@@ -170,6 +171,33 @@ public final class Encoder implements Visitor {
    */
   @Override
     public Object visitRepeatCommand(RepeatCommand ast, Object o) {
+        //Crea el bloque
+        Frame frame = (Frame) o;
+        //Genera el checkpoint por si hay que repetir la instruccion
+        int loopAddr = nextInstrAddr;
+        // Implementacion de los códigos del command y del expression
+        ast.C.visit(this, frame);
+        ast.E.visit(this, frame);
+        /**
+         * Genera el codigo del TAM
+         *  loopAddr :  execute C
+         *              evaluate E
+         *              JUMPIF (0) loopAddr
+         */
+        emit(Machine.JUMPIFop,Machine.falseRep,Machine.CBr,loopAddr);
+        return null;
+    }
+    /**
+   * VisitRepeatCommand
+   * Extended Triangle Compiler
+   * Realiza la generacion del codigo para el TAM del RepeatCommand
+   * su retorno es null debido a que es un comando
+   * @param ast -> arbol sintactico del comando repeat
+   * @param o -> nulo
+   * @return null
+   */
+  @Override
+    public Object visitDoWhileCommand(DoWhileCommand ast, Object o) {
         //Crea el bloque
         Frame frame = (Frame) o;
         //Genera el checkpoint por si hay que repetir la instruccion

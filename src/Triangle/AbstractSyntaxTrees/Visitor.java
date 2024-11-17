@@ -24,8 +24,9 @@ public interface Visitor {
   public abstract Object visitLetCommand(LetCommand ast, Object o);
   public abstract Object visitSequentialCommand(SequentialCommand ast, Object o);
   public abstract Object visitWhileCommand(WhileCommand ast, Object o);
-  //Added RepeatCommand
+  //Extended Triangle Compiler
   public abstract Object visitRepeatCommand (RepeatCommand ast, Object o);
+  public abstract Object visitDoWhileCommand (DoWhileCommand ast, Object o);
 
 
   // Expressions

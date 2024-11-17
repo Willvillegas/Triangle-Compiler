@@ -83,6 +83,7 @@ import Triangle.AbstractSyntaxTrees.VnameExpression;
 import Triangle.AbstractSyntaxTrees.WhileCommand;
 //Added
 import Triangle.AbstractSyntaxTrees.RepeatCommand;
+import Triangle.AbstractSyntaxTrees.DoWhileCommand;
 
 public class Parser {
 
@@ -337,9 +338,9 @@ public class Parser {
       break;
     /**
      * TODO
-     * Add RepeatCommand //Ready
+     * Add RepeatCommand    //Ready
      * Add ForCommand
-     * Add DoCommand
+     * Add DoCommand        //Ready
      * Add CaseCommand
      **/
      //Repeat ::= repeat Command until Expression 
@@ -351,6 +352,17 @@ public class Parser {
         finish(commandPos);
         //Creacion final del AST
         commandAST = new RepeatCommand(cAst,eAst,commandPos);
+    }
+    break;
+    //Do     ::= do Command while Expression
+    case Token.DO:{
+        acceptIt();
+        Command cAst = parseSingleCommand();
+        accept(Token.WHILE);
+        Expression eAst = parseExpression();
+        finish(commandPos);
+        //Creacion final del AST
+        commandAST = new DoWhileCommand(cAst,eAst,commandPos);
     }
     break;
 

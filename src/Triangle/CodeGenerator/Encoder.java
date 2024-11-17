@@ -47,6 +47,7 @@ import Triangle.AbstractSyntaxTrees.EmptyCommand;
 import Triangle.AbstractSyntaxTrees.EmptyExpression;
 import Triangle.AbstractSyntaxTrees.EmptyFormalParameterSequence;
 import Triangle.AbstractSyntaxTrees.ErrorTypeDenoter;
+import Triangle.AbstractSyntaxTrees.ForCommand;
 import Triangle.AbstractSyntaxTrees.FuncActualParameter;
 import Triangle.AbstractSyntaxTrees.FuncDeclaration;
 import Triangle.AbstractSyntaxTrees.FuncFormalParameter;
@@ -214,8 +215,57 @@ public final class Encoder implements Visitor {
         emit(Machine.JUMPIFop,Machine.falseRep,Machine.CBr,loopAddr);
         return null;
     }
+    /**
+     * VisitForCommand
+     * Extended Triangle Compiler
+     * @param ast -> arbol sintactico del forCommand
+     * @param o -> los frames (por defecto en null)
+     * @return null (por ser un commando)
+     */
+    @Override
+    public Object visitForCommand (ForCommand ast, Object o){
+        Frame frame = (Frame) o;
+        int jumpAddr, loopAddr;
+
+        // Evaluate the starting expression (E1) and store it in the V-name variable
+        ast.E1.visit(this, frame);
+        encodeStore(ast.Vn, new Frame(frame, 1), 1);
+
+        // Generate the jump instruction to skip the loop body initially
+        jumpAddr = nextInstrAddr;
+        emit(Machine.JUMPop, 0, Machine.CBr, 0);
+
+        // Mark the beginning of the loop body
+        loopAddr = nextInstrAddr;
+        ast.C.visit(this, frame);
+
+        // Increment the loop variable (V-name)
+        encodeFetch(ast.Vn, frame, 1);
+        if (ast.IL != null) {
+            // Use the IntegerLiteral value for the increment
+            emit(Machine.LOADLop, 0, 0, Integer.parseInt(ast.IL.spelling));
+        } else {
+            // Default increment of 1 if IntegerLiteral is not provided
+            emit(Machine.LOADLop, 0, 0, 1);
+        }
+        emit(Machine.CALLop, Machine.SBr, Machine.PBr, Machine.addDisplacement);
+        encodeStore(ast.Vn, new Frame(frame, 1), 1);
+
+        // Patch the initial jump to the loop condition
+        patch(jumpAddr, nextInstrAddr);
+
+        // Generate code for the loop condition
+        encodeFetch(ast.Vn, frame, 1);
+        ast.E2.visit(this, frame);
+        emit(Machine.CALLop, Machine.SBr, Machine.PBr, Machine.leDisplacement);
+
+        // Conditional jump to the beginning of the loop if the condition is true
+        emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, loopAddr);
+            return null;
+    }
 
   // Expressions
+  @Override
   public Object visitArrayExpression(ArrayExpression ast, Object o) {
     ast.type.visit(this, null);
     return ast.AA.visit(this, o);

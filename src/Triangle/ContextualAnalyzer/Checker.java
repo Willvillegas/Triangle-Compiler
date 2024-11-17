@@ -40,6 +40,7 @@ import Triangle.AbstractSyntaxTrees.EmptyExpression;
 import Triangle.AbstractSyntaxTrees.EmptyFormalParameterSequence;
 import Triangle.AbstractSyntaxTrees.ErrorTypeDenoter;
 import Triangle.AbstractSyntaxTrees.FieldTypeDenoter;
+import Triangle.AbstractSyntaxTrees.ForCommand;
 import Triangle.AbstractSyntaxTrees.FormalParameter;
 import Triangle.AbstractSyntaxTrees.FormalParameterSequence;
 import Triangle.AbstractSyntaxTrees.FuncActualParameter;
@@ -190,6 +191,47 @@ public final class Checker implements Visitor {
             reporter.reportError("Boolean expression expected here", "", ast.E.position);
         return null;
     }
+    /**
+     * 
+     * @param ast
+     * @param o
+     * @return 
+     */
+   @Override
+    public Object visitForCommand(ForCommand ast, Object o) {
+        // Visit the variable (V-name)
+        TypeDenoter vType = (TypeDenoter) ast.Vn.visit(this, null);
+        if (!ast.Vn.variable) {
+            reporter.reportError("identifier is not a variable", "", ast.Vn.position);
+        } else if (!(vType instanceof IntTypeDenoter)) {
+            reporter.reportError("Integer expected here", "", ast.Vn.position);
+        }
+
+        // Visit the starting expression
+        TypeDenoter e1Type = (TypeDenoter) ast.E1.visit(this, null);
+        if (!e1Type.equals(vType)) {
+            reporter.reportError("wrong type for starting expression", "", ast.E1.position);
+        }
+
+        // Visit the ending expression
+        TypeDenoter e2Type = (TypeDenoter) ast.E2.visit(this, null);
+        if (!e2Type.equals(vType)) {
+            reporter.reportError("wrong type for ending expression", "", ast.E2.position);
+        }
+
+        // Visit the optional by expression (Integer-Literal)
+        if (ast.IL != null) {
+            TypeDenoter ilType = (TypeDenoter) ast.IL.visit(this, null);
+            if (!(ilType instanceof IntTypeDenoter)) {
+                reporter.reportError("Integer literal expected here", "", ast.IL.position);
+            }
+        }
+
+        // Visit the single command
+        ast.C.visit(this, null);
+        return null;
+    }
+   
 
   // Expressions
 

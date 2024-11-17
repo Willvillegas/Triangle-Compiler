@@ -1,0 +1,9 @@
+let
+	var xx : Integer
+in
+begin
+for xx := 1 to 10 by 4 do
+    begin
+    putint(xx);
+    end
+end

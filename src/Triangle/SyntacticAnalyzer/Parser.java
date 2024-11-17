@@ -84,6 +84,7 @@ import Triangle.AbstractSyntaxTrees.WhileCommand;
 //Added
 import Triangle.AbstractSyntaxTrees.RepeatCommand;
 import Triangle.AbstractSyntaxTrees.DoWhileCommand;
+import Triangle.AbstractSyntaxTrees.ForCommand;
 
 public class Parser {
 
@@ -339,7 +340,7 @@ public class Parser {
     /**
      * TODO
      * Add RepeatCommand    //Ready
-     * Add ForCommand
+     * Add ForCommand       //Ready
      * Add DoCommand        //Ready
      * Add CaseCommand
      **/
@@ -365,7 +366,15 @@ public class Parser {
         commandAST = new DoWhileCommand(cAst,eAst,commandPos);
     }
     break;
-
+    /**
+     *  For    ::=  for V-name := Expression to Expression  
+                    [by Integer-Literal]  
+                    do  single-Command 
+     */
+    case Token.FOR:{
+        commandAST= parseForCommand();       
+    }
+    break;
     case Token.SEMICOLON:
     case Token.END:
     case Token.ELSE:
@@ -384,6 +393,36 @@ public class Parser {
     }
 
     return commandAST;
+  }
+  Command parseForCommand() throws SyntaxError{
+      Command commandAST = null; //Case error
+      SourcePosition commandPos = new SourcePosition();
+      start(commandPos);
+      /**
+       * For    ::=  for V-name := Expression to Expression  
+                    [by Integer-Literal]  
+                    do  single-Command 
+       */
+      // for V-Name
+      accept(Token.FOR);
+      Vname vAST = parseVname();
+      // := Expression
+      accept(Token.BECOMES);
+      Expression e1AST = parseExpression();
+      // to Expression
+      accept(Token.TO);
+      Expression e2AST = parseExpression();
+      // [ by Integer-Literal ]
+      IntegerLiteral byInteger = null;
+      if (currentToken.kind == Token.BY){
+          acceptIt();
+          byInteger = parseIntegerLiteral();
+      }
+      // do Command
+      accept(Token.DO);
+      Command cAST = parseSingleCommand();
+      commandAST = new ForCommand(vAST ,e1AST ,e2AST ,byInteger ,cAST ,commandPos);
+      return commandAST;
   }
 
 ///////////////////////////////////////////////////////////////////////////////

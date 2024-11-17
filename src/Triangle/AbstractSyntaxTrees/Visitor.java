@@ -27,6 +27,7 @@ public interface Visitor {
   //Extended Triangle Compiler
   public abstract Object visitRepeatCommand (RepeatCommand ast, Object o);
   public abstract Object visitDoWhileCommand (DoWhileCommand ast, Object o);
+  public abstract Object visitForCommand (ForCommand ast,Object o);
 
 
   // Expressions

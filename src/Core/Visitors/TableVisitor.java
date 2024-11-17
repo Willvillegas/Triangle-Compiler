@@ -27,6 +27,7 @@ import Triangle.AbstractSyntaxTrees.EmptyCommand;
 import Triangle.AbstractSyntaxTrees.EmptyExpression;
 import Triangle.AbstractSyntaxTrees.EmptyFormalParameterSequence;
 import Triangle.AbstractSyntaxTrees.ErrorTypeDenoter;
+import Triangle.AbstractSyntaxTrees.ForCommand;
 import Triangle.AbstractSyntaxTrees.FuncActualParameter;
 import Triangle.AbstractSyntaxTrees.FuncDeclaration;
 import Triangle.AbstractSyntaxTrees.FuncFormalParameter;
@@ -160,7 +161,7 @@ public class TableVisitor implements Visitor {
   /**
    * VisitRepeatCommand
    * Extended Triangle Compiler
-   * Visita el comando repeat para generar la tabla de variables y se visualice por medio del IDE Triangle
+   * Visita el comando repeat para generar la tabla de variables y se visualize por medio del IDE Triangle
    * @param ast -> Arbol sintactico generado por el compilador
    * @param o -> null por defecto, debido a que es un comando
    * @return null
@@ -172,6 +173,18 @@ public class TableVisitor implements Visitor {
       
       return(null);
   }
+  /**
+   * VisitForCommand
+   * Extended Triangle Compiler
+   * Visita el comando for para generar la tabla de variables y se visualize por medio del IDE Triangle
+   * @param ast
+   * @param o
+   * @return 
+   */
+  @Override
+    public Object visitForCommand(ForCommand ast, Object o) {
+        return null;
+    }
   // </editor-fold>
 
   // <editor-fold defaultstate="collapsed" desc=" Expressions ">

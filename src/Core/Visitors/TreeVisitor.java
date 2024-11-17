@@ -27,6 +27,7 @@ import Triangle.AbstractSyntaxTrees.EmptyCommand;
 import Triangle.AbstractSyntaxTrees.EmptyExpression;
 import Triangle.AbstractSyntaxTrees.EmptyFormalParameterSequence;
 import Triangle.AbstractSyntaxTrees.ErrorTypeDenoter;
+import Triangle.AbstractSyntaxTrees.ForCommand;
 import Triangle.AbstractSyntaxTrees.FuncActualParameter;
 import Triangle.AbstractSyntaxTrees.FuncDeclaration;
 import Triangle.AbstractSyntaxTrees.FuncFormalParameter;
@@ -140,6 +141,18 @@ public class TreeVisitor implements Visitor {
     @Override
     public Object visitDoWhileCommand(DoWhileCommand ast, Object o) {
         return(createBinary("DoWhile Command", ast.C, ast.E));
+    }
+    /**
+     * VisitForCommand
+     * Extended Triangle Compiler
+     * Visita el comando for para generar el ast que se observa en el IDE Compiler
+     * @param ast -> Arbol sintactico a recorrer
+     * @param o -> null por defecto
+     * @return null (porque es un comando)
+     */
+    @Override
+    public Object visitForCommand(ForCommand ast, Object o) {
+        return (createQuaternary("For Command", ast.Vn, ast.E1, ast.E2, ast.C));
     }
     // </editor-fold>
     

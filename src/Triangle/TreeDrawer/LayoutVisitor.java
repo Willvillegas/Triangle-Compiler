@@ -83,6 +83,7 @@ import Triangle.AbstractSyntaxTrees.WhileCommand;
 //Added
 import Triangle.AbstractSyntaxTrees.RepeatCommand;
 import Triangle.AbstractSyntaxTrees.DoWhileCommand;
+import Triangle.AbstractSyntaxTrees.ForCommand;
 
 public class LayoutVisitor implements Visitor {
 
@@ -128,9 +129,13 @@ public class LayoutVisitor implements Visitor {
   public Object visitRepeatCommand (RepeatCommand ast, Object obj){
       return layoutBinary("Rep.Com.",ast.C,ast.E);
   }
-  /*Added by Wilfredo Villegas RepeatUntilCommand*/
+  /*Added by Wilfredo Villegas DoWhileCommand*/
   public Object visitDoWhileCommand (DoWhileCommand ast, Object obj){
       return layoutBinary("DoWhile.Com.",ast.C,ast.E);
+  }
+  /*Added by Wilfredo Villegas ForCommand*/
+  public Object visitForCommand (ForCommand ast, Object obj){
+      return layoutQuaternary("For.Com.",ast.Vn,ast.E1,ast.E2,ast.C);
   }
 
 

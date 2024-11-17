@@ -80,6 +80,8 @@ import Triangle.AbstractSyntaxTrees.VarFormalParameter;
 import Triangle.AbstractSyntaxTrees.Visitor;
 import Triangle.AbstractSyntaxTrees.VnameExpression;
 import Triangle.AbstractSyntaxTrees.WhileCommand;
+//Added
+import Triangle.AbstractSyntaxTrees.RepeatCommand;
 
 public class LayoutVisitor implements Visitor {
 
@@ -119,6 +121,11 @@ public class LayoutVisitor implements Visitor {
 
   public Object visitWhileCommand(WhileCommand ast, Object obj) {
     return layoutBinary("WhileCom.", ast.E, ast.C);
+  }
+  
+  /*Added by Wilfredo Villegas RepeatUntilCommand*/
+  public Object visitRepeatCommand (RepeatCommand ast, Object obj){
+      return layoutBinary("Rep.Com.",ast.C,ast.E);
   }
 
 

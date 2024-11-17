@@ -1,0 +1,10 @@
+let
+    var x : Integer;
+    var j : Integer
+in
+    repeat
+        begin
+        putint(x);
+        x := x+1
+        end
+    until x = 14

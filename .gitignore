@@ -1,0 +1,12 @@
+test/**/*.tam
+# NetBeans
+nbproject/private/
+build/
+dist/
+build/
+
+# Java
+*.class
+*.jar
+*.war
+*.ear

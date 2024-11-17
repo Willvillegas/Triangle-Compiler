@@ -16,16 +16,16 @@ package Triangle.AbstractSyntaxTrees;
 
 import Triangle.SyntacticAnalyzer.SourcePosition;
 
-public class WhileCommand extends Command {
+public class RepeatCommand extends Command {
 
-  public WhileCommand (Expression eAST, Command cAST, SourcePosition thePosition) {
+  public RepeatCommand (Command cAST,Expression eAST,  SourcePosition thePosition) {
     super (thePosition);
     E = eAST;
     C = cAST;
   }
 
   public Object visit(Visitor v, Object o) {
-    return v.visitWhileCommand(this, o);
+    return v.visitRepeatCommand(this, o);
   }
 
   public Expression E;

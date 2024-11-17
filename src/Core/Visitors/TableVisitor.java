@@ -49,6 +49,7 @@ import Triangle.AbstractSyntaxTrees.ProcFormalParameter;
 import Triangle.AbstractSyntaxTrees.Program;
 import Triangle.AbstractSyntaxTrees.RecordExpression;
 import Triangle.AbstractSyntaxTrees.RecordTypeDenoter;
+import Triangle.AbstractSyntaxTrees.RepeatCommand;
 import Triangle.AbstractSyntaxTrees.SequentialCommand;
 import Triangle.AbstractSyntaxTrees.SequentialDeclaration;
 import Triangle.AbstractSyntaxTrees.SimpleTypeDenoter;
@@ -137,6 +138,21 @@ public class TableVisitor implements Visitor {
   public Object visitWhileCommand(WhileCommand ast, Object o) { 
       ast.E.visit(this, null);
       ast.C.visit(this, null);
+      
+      return(null);
+  }
+  /**
+   * VisitRepeatCommand
+   * Extended Triangle Compiler
+   * Visita el comando repeat para generar la tabla de variables y se visualice por medio del IDE Triangle
+   * @param ast -> Arbol sintactico generado por el compilador
+   * @param o -> null por defecto, debido a que es un comando
+   * @return null
+   */
+  @Override
+  public Object visitRepeatCommand(RepeatCommand ast, Object o) {
+      ast.C.visit(this, null);
+      ast.E.visit(this, null);     
       
       return(null);
   }

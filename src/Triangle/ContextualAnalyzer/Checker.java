@@ -64,6 +64,7 @@ import Triangle.AbstractSyntaxTrees.ProcFormalParameter;
 import Triangle.AbstractSyntaxTrees.Program;
 import Triangle.AbstractSyntaxTrees.RecordExpression;
 import Triangle.AbstractSyntaxTrees.RecordTypeDenoter;
+import Triangle.AbstractSyntaxTrees.RepeatCommand;
 import Triangle.AbstractSyntaxTrees.SequentialCommand;
 import Triangle.AbstractSyntaxTrees.SequentialDeclaration;
 import Triangle.AbstractSyntaxTrees.SimpleTypeDenoter;
@@ -153,6 +154,24 @@ public final class Checker implements Visitor {
     ast.C.visit(this, null);
     return null;
   }
+  
+  /**
+   * VisitRepeatCommand
+   * Extended Triangle Compiler
+   * Realiza la visita del analisis contextual del comando repeat
+   * su retorno es null debido a que es un comando.
+   * @param ast -> El arbol sintactico del repeat
+   * @param o -> Objeto que por defecto es null
+   * @return null
+   */
+  @Override
+    public Object visitRepeatCommand(RepeatCommand ast, Object o) {
+        ast.C.visit(this, null);
+        TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
+        if (!eType.equals(StdEnvironment.booleanType))
+            reporter.reportError("Boolean expression expected here", "", ast.E.position);
+        return null;
+    }
 
   // Expressions
 

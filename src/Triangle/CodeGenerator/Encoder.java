@@ -69,6 +69,7 @@ import Triangle.AbstractSyntaxTrees.ProcFormalParameter;
 import Triangle.AbstractSyntaxTrees.Program;
 import Triangle.AbstractSyntaxTrees.RecordExpression;
 import Triangle.AbstractSyntaxTrees.RecordTypeDenoter;
+import Triangle.AbstractSyntaxTrees.RepeatCommand;
 import Triangle.AbstractSyntaxTrees.SequentialCommand;
 import Triangle.AbstractSyntaxTrees.SequentialDeclaration;
 import Triangle.AbstractSyntaxTrees.SimpleTypeDenoter;
@@ -157,7 +158,34 @@ public final class Encoder implements Visitor {
     emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, loopAddr);
     return null;
   }
-
+  
+  /**
+   * VisitRepeatCommand
+   * Extended Triangle Compiler
+   * Realiza la generacion del codigo para el TAM del RepeatCommand
+   * su retorno es null debido a que es un comando
+   * @param ast -> arbol sintactico del comando repeat
+   * @param o -> nulo
+   * @return null
+   */
+  @Override
+    public Object visitRepeatCommand(RepeatCommand ast, Object o) {
+        //Crea el bloque
+        Frame frame = (Frame) o;
+        //Genera el checkpoint por si hay que repetir la instruccion
+        int loopAddr = nextInstrAddr;
+        // Implementacion de los códigos del command y del expression
+        ast.C.visit(this, frame);
+        ast.E.visit(this, frame);
+        /**
+         * Genera el codigo del TAM
+         *  loopAddr :  execute C
+         *              evaluate E
+         *              JUMPIF (0) loopAddr
+         */
+        emit(Machine.JUMPIFop,Machine.falseRep,Machine.CBr,loopAddr);
+        return null;
+    }
 
   // Expressions
   public Object visitArrayExpression(ArrayExpression ast, Object o) {
@@ -175,7 +203,7 @@ public final class Encoder implements Visitor {
     ast.O.visit(this, frame2);
     return valSize;
   }
-
+  
   public Object visitCallExpression(CallExpression ast, Object o) {
     Frame frame = (Frame) o;
     Integer valSize = (Integer) ast.type.visit(this, null);

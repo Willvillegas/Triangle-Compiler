@@ -81,6 +81,8 @@ import Triangle.AbstractSyntaxTrees.VarFormalParameter;
 import Triangle.AbstractSyntaxTrees.Vname;
 import Triangle.AbstractSyntaxTrees.VnameExpression;
 import Triangle.AbstractSyntaxTrees.WhileCommand;
+//Added
+import Triangle.AbstractSyntaxTrees.RepeatCommand;
 
 public class Parser {
 
@@ -333,6 +335,24 @@ public class Parser {
         commandAST = new WhileCommand(eAST, cAST, commandPos);
       }
       break;
+    /**
+     * TODO
+     * Add RepeatCommand //Ready
+     * Add ForCommand
+     * Add DoCommand
+     * Add CaseCommand
+     **/
+     //Repeat ::= repeat Command until Expression 
+    case Token.REPEAT:{
+        acceptIt();
+        Command cAst = parseSingleCommand();
+        accept(Token.UNTIL);
+        Expression eAst = parseExpression();
+        finish(commandPos);
+        //Creacion final del AST
+        commandAST = new RepeatCommand(cAst,eAst,commandPos);
+    }
+    break;
 
     case Token.SEMICOLON:
     case Token.END:
@@ -603,7 +623,7 @@ public class Parser {
 
   Declaration parseSingleDeclaration() throws SyntaxError {
     Declaration declarationAST = null; // in case there's a syntactic error
-
+    
     SourcePosition declarationPos = new SourcePosition();
     start(declarationPos);
 

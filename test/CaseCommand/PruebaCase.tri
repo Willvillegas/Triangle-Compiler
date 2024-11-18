@@ -1,0 +1,14 @@
+let
+    var j : Integer;
+    var x : Char
+in
+    begin
+    x :='a';
+    j := 3;
+    case j of
+        43:      putint(10);
+        2:      putint(20);
+        3:      putint(30);
+        else:   putint(100);
+    putint(j)
+    end

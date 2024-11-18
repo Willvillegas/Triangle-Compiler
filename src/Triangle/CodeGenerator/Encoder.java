@@ -33,15 +33,19 @@ import Triangle.AbstractSyntaxTrees.BinaryOperatorDeclaration;
 import Triangle.AbstractSyntaxTrees.BoolTypeDenoter;
 import Triangle.AbstractSyntaxTrees.CallCommand;
 import Triangle.AbstractSyntaxTrees.CallExpression;
+import Triangle.AbstractSyntaxTrees.CaseAggregate;
+import Triangle.AbstractSyntaxTrees.CaseCommand;
 import Triangle.AbstractSyntaxTrees.CharTypeDenoter;
 import Triangle.AbstractSyntaxTrees.CharacterExpression;
 import Triangle.AbstractSyntaxTrees.CharacterLiteral;
+import Triangle.AbstractSyntaxTrees.CharacterLiteralAggregate;
 import Triangle.AbstractSyntaxTrees.ConstActualParameter;
 import Triangle.AbstractSyntaxTrees.ConstDeclaration;
 import Triangle.AbstractSyntaxTrees.ConstFormalParameter;
 import Triangle.AbstractSyntaxTrees.Declaration;
 import Triangle.AbstractSyntaxTrees.DotVname;
 import Triangle.AbstractSyntaxTrees.DoWhileCommand;
+import Triangle.AbstractSyntaxTrees.ElseCaseAggregate;
 import Triangle.AbstractSyntaxTrees.EmptyActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.EmptyCommand;
 import Triangle.AbstractSyntaxTrees.EmptyExpression;
@@ -57,6 +61,7 @@ import Triangle.AbstractSyntaxTrees.IfExpression;
 import Triangle.AbstractSyntaxTrees.IntTypeDenoter;
 import Triangle.AbstractSyntaxTrees.IntegerExpression;
 import Triangle.AbstractSyntaxTrees.IntegerLiteral;
+import Triangle.AbstractSyntaxTrees.IntegerLiteralAggregate;
 import Triangle.AbstractSyntaxTrees.LetCommand;
 import Triangle.AbstractSyntaxTrees.LetExpression;
 import Triangle.AbstractSyntaxTrees.MultipleActualParameterSequence;
@@ -263,6 +268,75 @@ public final class Encoder implements Visitor {
         // Conditional jump to the beginning of the loop if the condition is true
         emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, loopAddr);
             return null;
+    }
+    
+    /**
+     * VisitCaseCommand
+     * Extended Triangle Compiler
+     * Dado un arbol sintactico, genera el código correspondiente a un caseCommand
+     * @param ast -> arbol sintactico a generar
+     * @param o -> null por defecto
+     * @return null
+     * 
+     * Sugerencia de cómo implementarlo con chatgpt::: https://chatgpt.com/share/673ad6ab-91cc-8006-914a-9df92d8f92a1
+     */
+    @Override
+    public Object visitCaseCommand(CaseCommand ast, Object o) {
+        //uso el frame
+        
+        Frame frame = (Frame) o;
+        /*
+        int extraSize = (Integer) ast.Vn.visit(this, frame);
+        //carga la variable conocida
+        if (ast.Vn.entity instanceof KnownValue)
+            emit(Machine.LOADLop, 0, 0, ((KnownValue) ast.Vn.entity).value);
+        //genera el de los demás
+        */
+        
+        encodeFetch(ast.Vn, frame,Machine.integerSize); // Assuming V is the new Vname attribute
+        ast.Ca.visit(this, frame);
+        //genero los saltos con respecto a los demás nodos
+        //si es integer
+        if (ast.Ca instanceof IntegerLiteralAggregate){
+            for (CaseAggregate current = ast.Ca;(current instanceof IntegerLiteralAggregate); current = ((IntegerLiteralAggregate) current).CA){
+                patch(((IntegerLiteralAggregate)current).jump, nextInstrAddr);
+            }
+        }else {
+            for (CaseAggregate current = ast.Ca;(current instanceof CharacterLiteralAggregate); current = ((CharacterLiteralAggregate) current).CA){
+                patch(((CharacterLiteralAggregate) current).jump, nextInstrAddr);
+            }
+        }
+        //salida del case
+        emit(Machine.POPop, 0, 0, 1);
+        
+        //////NUEVA PRUEBA DE SUGRENCIA CHATGPT
+        /*Frame frame = (Frame) o;
+
+        // Cargar el valor de la variable evaluada en el case.
+        ast.Vn.visit(this, frame); // Carga el valor en la pila.
+
+        // Dirección para gestionar el salto al final del bloque case.
+        int endCaseAddr = nextInstrAddr;
+        emit(Machine.JUMPop, 0, Machine.CBr, 0); // Placeholder para parchear.
+
+        // Recorrer y visitar cada CaseAggregate.
+        CaseAggregate currentCase = ast.Ca;
+        while (currentCase != null) {
+            currentCase.visit(this, frame);
+            // Navegar al siguiente CaseAggregate.
+            if (currentCase instanceof IntegerLiteralAggregate) {
+                currentCase = ((IntegerLiteralAggregate) currentCase).CA;
+            } else if (currentCase instanceof CharacterLiteralAggregate) {
+                currentCase = ((CharacterLiteralAggregate) currentCase).CA;
+            } else if (currentCase instanceof ElseCaseAggregate) {
+                currentCase = null; // No hay más casos.
+            }
+        }
+        */
+        // Parchear salto al final del bloque case.
+        //patch(endCaseAddr, nextInstrAddr);
+        //emit(Machine.POPop, 0, 0, 1);
+        return null;
     }
 
   // Expressions
@@ -492,6 +566,94 @@ public final class Encoder implements Visitor {
 					   Object o) {
     return ast.E.visit(this, o);
   }
+  
+  //Case Aggregate
+  @Override
+    public Object visitIntegerLiteralAggregate(IntegerLiteralAggregate ast, Object o) {
+        Frame frame = (Frame) o;
+        //obtenemos las direcciones de las instrucciones
+        int jumpIfAddr, jumpPast;
+        
+        emit(Machine.LOADop, 1, Machine.STr, -1);
+        jumpIfAddr = nextInstrAddr;
+        
+        emit(Machine.JUMPIFop, Integer.parseInt(ast.IL.spelling), Machine.CBr, 0);
+        jumpPast = nextInstrAddr;
+        
+        emit(Machine.JUMPop, 0, Machine.CBr, 0);
+        patch(jumpIfAddr, nextInstrAddr);
+        
+        ast.C.visit(this, frame);
+        ast.jump = nextInstrAddr;
+        emit(Machine.JUMPop, 0, Machine.CBr, 0);
+        patch(jumpPast, nextInstrAddr);
+        //generamos el código del siguiente
+        ast.CA.visit(this, frame);/*
+        Frame frame = (Frame) o;
+
+        // Cargar el literal entero y comparar.
+        emit(Machine.LOADLop, 0, 0, Integer.parseInt(ast.IL.spelling));
+        emit(Machine.CALLop, Machine.SBr, Machine.PBr, Machine.eqDisplacement);
+
+        // Generar salto si es igual.
+        int jumpAddr = nextInstrAddr;
+        emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, 0);
+
+        // Generar código del comando asociado al caso.
+        ast.C.visit(this, frame);
+
+        // Saltar al final del bloque case.
+        emit(Machine.JUMPop, 0, Machine.CBr, 0);
+
+        // Parchear salto condicional.
+        patch(jumpAddr, nextInstrAddr);*/
+        return null;
+    }
+
+    @Override
+    public Object visitCharacterLiteralAggregate(CharacterLiteralAggregate ast, Object o) {
+        Frame frame = (Frame) o;
+        int jumpIfAddr, jumpPast;
+
+        emit(Machine.LOADop, 1, Machine.STr, -1);
+        jumpIfAddr = nextInstrAddr;
+        emit(Machine.JUMPIFop, characterValuation(ast.CL.spelling), Machine.CBr, 0);
+        jumpPast = nextInstrAddr;
+        emit(Machine.JUMPop, 0, Machine.CBr, 0);
+        patch(jumpIfAddr, nextInstrAddr);
+        ast.C.visit(this, frame);
+        ast.jump = nextInstrAddr;
+        emit(Machine.JUMPop, 0, Machine.CBr, 0);
+        patch(jumpPast, nextInstrAddr);
+        ast.CA.visit(this, frame);
+        /*
+        Frame frame = (Frame) o;
+
+        // Cargar el literal de carácter y comparar.
+        emit(Machine.LOADLop, 0, 0, characterValuation(ast.CL.spelling));
+        emit(Machine.CALLop, Machine.SBr, Machine.PBr, Machine.eqDisplacement);
+
+        // Generar salto si es igual.
+        int jumpAddr = nextInstrAddr;
+        emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, 0);
+
+        // Generar código del comando asociado al caso.
+        ast.C.visit(this, frame);
+
+        // Saltar al final del bloque case.
+        emit(Machine.JUMPop, 0, Machine.CBr, 0);
+
+        // Parchear salto condicional.
+        patch(jumpAddr, nextInstrAddr);*/
+        return null;
+    }
+
+    @Override
+    public Object visitElseAggregate(ElseCaseAggregate ast, Object o) {
+        Frame frame = (Frame) o;
+        ast.C.visit(this, frame);
+        return null;
+    }
 
 
   // Formal Parameters
@@ -701,6 +863,7 @@ public final class Encoder implements Visitor {
     return new Integer(fieldSize + recSize);
   }
 
+  @Override
   public Object visitSingleFieldTypeDenoter(SingleFieldTypeDenoter ast,
 					    Object o) {
     int offset = ((Integer) o).intValue();

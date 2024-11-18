@@ -85,6 +85,11 @@ import Triangle.AbstractSyntaxTrees.WhileCommand;
 import Triangle.AbstractSyntaxTrees.RepeatCommand;
 import Triangle.AbstractSyntaxTrees.DoWhileCommand;
 import Triangle.AbstractSyntaxTrees.ForCommand;
+import Triangle.AbstractSyntaxTrees.CaseCommand;
+import Triangle.AbstractSyntaxTrees.CaseAggregate;
+import Triangle.AbstractSyntaxTrees.IntegerLiteralAggregate;
+import Triangle.AbstractSyntaxTrees.CharacterLiteralAggregate;
+import Triangle.AbstractSyntaxTrees.ElseCaseAggregate;
 
 public class Parser {
 
@@ -342,7 +347,7 @@ public class Parser {
      * Add RepeatCommand    //Ready
      * Add ForCommand       //Ready
      * Add DoCommand        //Ready
-     * Add CaseCommand
+     * Add CaseCommand      //Ready
      **/
      //Repeat ::= repeat Command until Expression 
     case Token.REPEAT:{
@@ -373,6 +378,21 @@ public class Parser {
      */
     case Token.FOR:{
         commandAST= parseForCommand();       
+    }
+    break;
+    /**
+     * case-Command ::= case V-name of 
+                    ( (Integer-Literal | Character-Literal) : single-Command )+ 
+                 end 
+     */
+    case Token.CASE:{
+        acceptIt();
+        Vname vAST = parseVname();
+        accept(Token.OF);
+        CaseAggregate caAST = parseCaseAggregate();
+        finish(commandPos);
+        commandAST = new CaseCommand (vAST,caAST,commandPos);
+        
     }
     break;
     case Token.SEMICOLON:
@@ -577,6 +597,11 @@ public class Parser {
     }
     return expressionAST;
   }
+  
+  /**
+   * AGGREGATES TRIANGLE COMPILER
+   * 
+   */
 
   RecordAggregate parseRecordAggregate() throws SyntaxError {
     RecordAggregate aggregateAST = null; // in case there's a syntactic error
@@ -617,6 +642,36 @@ public class Parser {
       aggregateAST = new SingleArrayAggregate(eAST, aggregatePos);
     }
     return aggregateAST;
+  }
+  
+  CaseAggregate parseCaseAggregate() throws SyntaxError {
+      CaseAggregate aggregateAST = null; // in case there's a syntactic error
+      SourcePosition aggregatePos = new SourcePosition();
+      start(aggregatePos);
+      if (currentToken.kind == Token.INTLITERAL) {
+          IntegerLiteral ilAST = parseIntegerLiteral();
+          accept(Token.COLON);
+          Command cAST = parseSingleCommand();
+          accept(Token.SEMICOLON);
+          CaseAggregate aAST = parseCaseAggregate();
+          finish(aggregatePos);
+          aggregateAST = new IntegerLiteralAggregate(ilAST, cAST, aAST, aggregatePos);
+      } else if (currentToken.kind == Token.CHARLITERAL){
+          CharacterLiteral clAST = parseCharacterLiteral();
+          accept(Token.COLON);
+          Command cAST = parseSingleCommand();
+          accept(Token.SEMICOLON);
+          CaseAggregate aAST = parseCaseAggregate();
+          finish(aggregatePos);
+          aggregateAST = new CharacterLiteralAggregate(clAST, cAST, aAST, aggregatePos);
+      } else {
+          accept(Token.ELSE);
+          accept(Token.COLON);
+          Command cAST = parseSingleCommand();
+          finish(aggregatePos);
+          aggregateAST = new ElseCaseAggregate(cAST, aggregatePos);
+      }
+      return aggregateAST;
   }
 
 ///////////////////////////////////////////////////////////////////////////////

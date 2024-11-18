@@ -28,6 +28,7 @@ public interface Visitor {
   public abstract Object visitRepeatCommand (RepeatCommand ast, Object o);
   public abstract Object visitDoWhileCommand (DoWhileCommand ast, Object o);
   public abstract Object visitForCommand (ForCommand ast,Object o);
+  public abstract Object visitCaseCommand (CaseCommand ast,Object o);
 
 
   // Expressions
@@ -60,6 +61,11 @@ public interface Visitor {
   // Record Aggregates
   public abstract Object visitMultipleRecordAggregate(MultipleRecordAggregate ast, Object o);
   public abstract Object visitSingleRecordAggregate(SingleRecordAggregate ast, Object o);
+  
+  // Case Aggregates
+  public abstract Object visitIntegerLiteralAggregate(IntegerLiteralAggregate ast,Object o);
+  public abstract Object visitCharacterLiteralAggregate(CharacterLiteralAggregate ast,Object o);
+  public abstract Object visitElseAggregate(ElseCaseAggregate ast,Object o);
 
   // Formal Parameters
   public abstract Object visitConstFormalParameter(ConstFormalParameter ast, Object o);

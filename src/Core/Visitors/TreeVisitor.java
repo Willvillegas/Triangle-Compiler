@@ -14,14 +14,17 @@ import Triangle.AbstractSyntaxTrees.BinaryOperatorDeclaration;
 import Triangle.AbstractSyntaxTrees.BoolTypeDenoter;
 import Triangle.AbstractSyntaxTrees.CallCommand;
 import Triangle.AbstractSyntaxTrees.CallExpression;
+import Triangle.AbstractSyntaxTrees.CaseCommand;
 import Triangle.AbstractSyntaxTrees.CharTypeDenoter;
 import Triangle.AbstractSyntaxTrees.CharacterExpression;
 import Triangle.AbstractSyntaxTrees.CharacterLiteral;
+import Triangle.AbstractSyntaxTrees.CharacterLiteralAggregate;
 import Triangle.AbstractSyntaxTrees.ConstActualParameter;
 import Triangle.AbstractSyntaxTrees.ConstDeclaration;
 import Triangle.AbstractSyntaxTrees.ConstFormalParameter;
 import Triangle.AbstractSyntaxTrees.DotVname;
 import Triangle.AbstractSyntaxTrees.DoWhileCommand;
+import Triangle.AbstractSyntaxTrees.ElseCaseAggregate;
 import Triangle.AbstractSyntaxTrees.EmptyActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.EmptyCommand;
 import Triangle.AbstractSyntaxTrees.EmptyExpression;
@@ -37,6 +40,7 @@ import Triangle.AbstractSyntaxTrees.IfExpression;
 import Triangle.AbstractSyntaxTrees.IntTypeDenoter;
 import Triangle.AbstractSyntaxTrees.IntegerExpression;
 import Triangle.AbstractSyntaxTrees.IntegerLiteral;
+import Triangle.AbstractSyntaxTrees.IntegerLiteralAggregate;
 import Triangle.AbstractSyntaxTrees.LetCommand;
 import Triangle.AbstractSyntaxTrees.LetExpression;
 import Triangle.AbstractSyntaxTrees.MultipleActualParameterSequence;
@@ -154,6 +158,19 @@ public class TreeVisitor implements Visitor {
     public Object visitForCommand(ForCommand ast, Object o) {
         return (createQuaternary("For Command", ast.Vn, ast.E1, ast.E2, ast.C));
     }
+    /**
+     * VisitCaseCommand
+     * Extended Tringle Compiler
+     * Visita el comando case para generar el ast que se muestra en el IDE Compiler
+     * @param ast -> Arbol sintactico a recorrer
+     * @param o -> null por defecto
+     * @return null (porque es un comando)
+     */
+    @Override
+    public Object visitCaseCommand(CaseCommand ast, Object o) {
+        return (createBinary("Case Command", ast.Vn, ast.Ca));
+    }
+
     // </editor-fold>
     
     // <editor-fold defaultstate="collapsed" desc=" Expressions ">
@@ -255,6 +272,21 @@ public class TreeVisitor implements Visitor {
     
     public Object visitSingleRecordAggregate(SingleRecordAggregate ast, Object obj) {
         return(createBinary("Single Record Aggregate", ast.I, ast.E));
+    }
+    @Override
+    public Object visitIntegerLiteralAggregate(IntegerLiteralAggregate ast, Object o) {
+        return(this.createTernary("IntegerLiteral Aggregate", ast.IL, ast.C, ast.CA));
+    }
+
+    @Override
+    public Object visitCharacterLiteralAggregate(CharacterLiteralAggregate ast, Object o) {
+        return(this.createTernary("IntegerLiteral Aggregate", ast.CL, ast.C, ast.CA));
+    }
+
+    @Override
+    public Object visitElseAggregate(ElseCaseAggregate ast, Object o) {
+        return(this.createUnary("Else Case Aggregate", ast.C));
+
     }
     // </editor-fold>
     

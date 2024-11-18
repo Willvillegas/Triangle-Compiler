@@ -14,14 +14,17 @@ import Triangle.AbstractSyntaxTrees.BinaryOperatorDeclaration;
 import Triangle.AbstractSyntaxTrees.BoolTypeDenoter;
 import Triangle.AbstractSyntaxTrees.CallCommand;
 import Triangle.AbstractSyntaxTrees.CallExpression;
+import Triangle.AbstractSyntaxTrees.CaseCommand;
 import Triangle.AbstractSyntaxTrees.CharTypeDenoter;
 import Triangle.AbstractSyntaxTrees.CharacterExpression;
 import Triangle.AbstractSyntaxTrees.CharacterLiteral;
+import Triangle.AbstractSyntaxTrees.CharacterLiteralAggregate;
 import Triangle.AbstractSyntaxTrees.ConstActualParameter;
 import Triangle.AbstractSyntaxTrees.ConstDeclaration;
 import Triangle.AbstractSyntaxTrees.ConstFormalParameter;
 import Triangle.AbstractSyntaxTrees.DotVname;
 import Triangle.AbstractSyntaxTrees.DoWhileCommand;
+import Triangle.AbstractSyntaxTrees.ElseCaseAggregate;
 import Triangle.AbstractSyntaxTrees.EmptyActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.EmptyCommand;
 import Triangle.AbstractSyntaxTrees.EmptyExpression;
@@ -37,6 +40,7 @@ import Triangle.AbstractSyntaxTrees.IfExpression;
 import Triangle.AbstractSyntaxTrees.IntTypeDenoter;
 import Triangle.AbstractSyntaxTrees.IntegerExpression;
 import Triangle.AbstractSyntaxTrees.IntegerLiteral;
+import Triangle.AbstractSyntaxTrees.IntegerLiteralAggregate;
 import Triangle.AbstractSyntaxTrees.LetCommand;
 import Triangle.AbstractSyntaxTrees.LetExpression;
 import Triangle.AbstractSyntaxTrees.MultipleActualParameterSequence;
@@ -187,6 +191,20 @@ public class TableVisitor implements Visitor {
         ast.E1.visit(this, null);
         ast.E2.visit(this, null);
         ast.C.visit(this, null);
+        return null;
+    }
+    /**
+     * VisitCaseCommand
+     * Extended Triangle Compiler
+     * Visita el comando case para genera la tabla de variables correspondiente
+     * @param ast -> arbol sintactico a tratar
+     * @param o -> null por defecto
+     * @return null
+     */
+    @Override
+    public Object visitCaseCommand(CaseCommand ast, Object o) {
+        ast.Vn.visit(this, null);
+        ast.Ca.visit(this, null);
         return null;
     }
   // </editor-fold>
@@ -390,6 +408,28 @@ public class TableVisitor implements Visitor {
       
       return(null);
   }
+  
+    @Override
+    public Object visitIntegerLiteralAggregate(IntegerLiteralAggregate ast, Object o) {
+        ast.IL.visit(this, null);
+        ast.C.visit(this, null);
+        ast.CA.visit(this, null);
+        return null;
+    }
+
+    @Override
+    public Object visitCharacterLiteralAggregate(CharacterLiteralAggregate ast, Object o) {
+        ast.CL.visit(this, null);
+        ast.C.visit(this, null);
+        ast.CA.visit(this, null);
+        return null;
+    }
+
+    @Override
+    public Object visitElseAggregate(ElseCaseAggregate ast, Object o) {
+        ast.C.visit(this, null);
+        return null;
+    }
   // </editor-fold>
 
   // <editor-fold defaultstate="collapsed" desc=" Parameters ">

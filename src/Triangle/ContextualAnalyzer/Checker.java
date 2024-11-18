@@ -25,15 +25,19 @@ import Triangle.AbstractSyntaxTrees.BinaryOperatorDeclaration;
 import Triangle.AbstractSyntaxTrees.BoolTypeDenoter;
 import Triangle.AbstractSyntaxTrees.CallCommand;
 import Triangle.AbstractSyntaxTrees.CallExpression;
+import Triangle.AbstractSyntaxTrees.CaseCommand;
+import Triangle.AbstractSyntaxTrees.CaseAggregate;
 import Triangle.AbstractSyntaxTrees.CharTypeDenoter;
 import Triangle.AbstractSyntaxTrees.CharacterExpression;
 import Triangle.AbstractSyntaxTrees.CharacterLiteral;
+import Triangle.AbstractSyntaxTrees.CharacterLiteralAggregate;
 import Triangle.AbstractSyntaxTrees.ConstActualParameter;
 import Triangle.AbstractSyntaxTrees.ConstDeclaration;
 import Triangle.AbstractSyntaxTrees.ConstFormalParameter;
 import Triangle.AbstractSyntaxTrees.Declaration;
 import Triangle.AbstractSyntaxTrees.DotVname;
 import Triangle.AbstractSyntaxTrees.DoWhileCommand;
+import Triangle.AbstractSyntaxTrees.ElseCaseAggregate;
 import Triangle.AbstractSyntaxTrees.EmptyActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.EmptyCommand;
 import Triangle.AbstractSyntaxTrees.EmptyExpression;
@@ -52,6 +56,7 @@ import Triangle.AbstractSyntaxTrees.IfExpression;
 import Triangle.AbstractSyntaxTrees.IntTypeDenoter;
 import Triangle.AbstractSyntaxTrees.IntegerExpression;
 import Triangle.AbstractSyntaxTrees.IntegerLiteral;
+import Triangle.AbstractSyntaxTrees.IntegerLiteralAggregate;
 import Triangle.AbstractSyntaxTrees.LetCommand;
 import Triangle.AbstractSyntaxTrees.LetExpression;
 import Triangle.AbstractSyntaxTrees.MultipleActualParameterSequence;
@@ -89,6 +94,7 @@ import Triangle.AbstractSyntaxTrees.Visitor;
 import Triangle.AbstractSyntaxTrees.VnameExpression;
 import Triangle.AbstractSyntaxTrees.WhileCommand;
 import Triangle.SyntacticAnalyzer.SourcePosition;
+import java.util.ArrayList;
 
 public final class Checker implements Visitor {
 
@@ -233,7 +239,20 @@ public final class Checker implements Visitor {
         ast.C.visit(this, null);
         return null;
     }
-   
+    @Override
+    public Object visitCaseCommand(CaseCommand ast, Object o) {
+        TypeDenoter eType = (TypeDenoter)ast.Vn.visit(this, null);
+        // valida si no es de tipo entero o de tipo character
+        if (!(eType.equals(StdEnvironment.integerType) || eType.equals(StdEnvironment.charType)))
+            reporter.reportError("Integer o Character expression expected here ", "" , ast.Vn.position);
+        // valida la visita si es de tipo integer o character
+        if (eType.equals(StdEnvironment.integerType)){
+            ast.Ca.visit(this, new ArrayList<Integer>());
+        }else{
+            ast.Ca.visit(this, new ArrayList<Character>());
+        }
+        return null;
+    }
 
   // Expressions
 
@@ -475,6 +494,45 @@ public final class Checker implements Visitor {
     ast.type = new SingleFieldTypeDenoter(ast.I, eType, ast.position);
     return ast.type;
   }
+  
+  /**
+   * Case Aggregates
+   */
+    @Override
+    public Object visitIntegerLiteralAggregate(IntegerLiteralAggregate ast, Object o) {
+        ArrayList<Integer> used = (ArrayList<Integer>) o;
+        //verifica si hay duplicados
+        int val = Integer.parseInt(ast.IL.spelling);
+        if (used.contains(val))
+            reporter.reportError("Duplicated case: ", ast.IL.spelling, ast.IL.position);
+        else
+            used.add(val);
+        //visita los demás nodos
+        ast.C.visit(this, null);
+        ast.CA.visit(this, used);
+        return null;
+    }
+
+    @Override
+    public Object visitCharacterLiteralAggregate(CharacterLiteralAggregate ast, Object o) {
+        ArrayList<Character> used = (ArrayList<Character>) o;
+        //verifica si hay duplicados
+        char val = (ast.CL.spelling).charAt(1);
+        if (used.contains(val))
+            reporter.reportError("Duplicated case: ", ast.CL.spelling, ast.CL.position);
+        else
+            used.add(val);
+        //visita los demás nodos
+        ast.C.visit(this, null);
+        ast.CA.visit(this, used);
+        return null;
+    }
+
+    @Override
+    public Object visitElseAggregate(ElseCaseAggregate ast, Object o) {
+        ast.C.visit(this, null);
+        return null;
+    }
 
   // Formal Parameters
 

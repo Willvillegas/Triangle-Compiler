@@ -27,10 +27,12 @@ import Triangle.AbstractSyntaxTrees.CallCommand;
 import Triangle.AbstractSyntaxTrees.CallExpression;
 import Triangle.AbstractSyntaxTrees.CaseCommand;
 import Triangle.AbstractSyntaxTrees.CaseAggregate;
+import Triangle.AbstractSyntaxTrees.CaseExpression;
 import Triangle.AbstractSyntaxTrees.CharTypeDenoter;
 import Triangle.AbstractSyntaxTrees.CharacterExpression;
 import Triangle.AbstractSyntaxTrees.CharacterLiteral;
 import Triangle.AbstractSyntaxTrees.CharacterLiteralAggregate;
+import Triangle.AbstractSyntaxTrees.CharacterLiteralAggregateExpression;
 import Triangle.AbstractSyntaxTrees.ConstActualParameter;
 import Triangle.AbstractSyntaxTrees.ConstDeclaration;
 import Triangle.AbstractSyntaxTrees.ConstFormalParameter;
@@ -38,6 +40,7 @@ import Triangle.AbstractSyntaxTrees.Declaration;
 import Triangle.AbstractSyntaxTrees.DotVname;
 import Triangle.AbstractSyntaxTrees.DoWhileCommand;
 import Triangle.AbstractSyntaxTrees.ElseCaseAggregate;
+import Triangle.AbstractSyntaxTrees.ElseCaseAggregateExpression;
 import Triangle.AbstractSyntaxTrees.EmptyActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.EmptyCommand;
 import Triangle.AbstractSyntaxTrees.EmptyExpression;
@@ -57,6 +60,7 @@ import Triangle.AbstractSyntaxTrees.IntTypeDenoter;
 import Triangle.AbstractSyntaxTrees.IntegerExpression;
 import Triangle.AbstractSyntaxTrees.IntegerLiteral;
 import Triangle.AbstractSyntaxTrees.IntegerLiteralAggregate;
+import Triangle.AbstractSyntaxTrees.IntegerLiteralAggregateExpression;
 import Triangle.AbstractSyntaxTrees.LetCommand;
 import Triangle.AbstractSyntaxTrees.LetExpression;
 import Triangle.AbstractSyntaxTrees.MultipleActualParameterSequence;
@@ -379,6 +383,25 @@ public final class Checker implements Visitor {
     ast.type = (TypeDenoter) ast.V.visit(this, null);
     return ast.type;
   }
+  
+  @Override
+    public Object visitCaseExpression(CaseExpression ast, Object o) {
+        TypeDenoter eType = (TypeDenoter)ast.Vn.visit(this, null);
+        // valida si no es de tipo entero o de tipo character
+        if (!(eType.equals(StdEnvironment.integerType) || eType.equals(StdEnvironment.charType)))
+            reporter.reportError("Integer o Character expression expected here ", "" , ast.Vn.position);
+        // valida la visita si es de tipo integer o character
+        // e ingresa el tipo de dato a valorar:
+        TypeDenoter caType = null; //case error
+        if (eType.equals(StdEnvironment.integerType)){
+            caType = (TypeDenoter) ast.Ca.visit(this, new ArrayList<Integer>());
+        }else{
+            caType = (TypeDenoter) ast.Ca.visit(this, new ArrayList<Character>());
+        }
+        //defino el tipo en el AST principal
+        ast.type = caType;
+        return ast.type;
+    }
 
   // Declarations
 
@@ -496,7 +519,7 @@ public final class Checker implements Visitor {
   }
   
   /**
-   * Case Aggregates
+   * Case Aggregates (Command)
    */
     @Override
     public Object visitIntegerLiteralAggregate(IntegerLiteralAggregate ast, Object o) {
@@ -533,7 +556,61 @@ public final class Checker implements Visitor {
         ast.C.visit(this, null);
         return null;
     }
+    
+    /**
+     * Case Aggregates (Expression)
+     */
+    @Override
+    public Object visitIntegerLiteralAggregateExpression(IntegerLiteralAggregateExpression ast, Object o) {
+        ArrayList<Integer> used = (ArrayList<Integer>) o;
+        //verifica si hay duplicados
+        int val = Integer.parseInt(ast.IL.spelling);
+        if (used.contains(val))
+            reporter.reportError("Duplicated case: ", ast.IL.spelling, ast.IL.position);
+        else
+            used.add(val);
+        //visita los demás nodos y valida su tipo
+        TypeDenoter eType= (TypeDenoter) ast.E.visit(this, null);
+        TypeDenoter caType = (TypeDenoter) ast.CA.visit(this, used);
+        if (!eType.equals(caType)){
+            reporter.reportError("Incompatible types: ", "", ast.E.position);
+        }
+        ast.type = eType;
+        return ast.type;
+    }
 
+    @Override
+    public Object visitCharacterLiteralAggregateExpression(CharacterLiteralAggregateExpression ast, Object o) {
+        var used = (ArrayList<Character>) o;
+        //verifica si hay duplicados
+        char val = (ast.CL.spelling).charAt(1);
+        if (used.contains(val))
+            reporter.reportError("Duplicated case: ", ast.CL.spelling, ast.CL.position);
+        else
+            used.add(val);
+        //visita los demás nodos y valida su tipo
+        TypeDenoter eType= (TypeDenoter) ast.E.visit(this, null);
+        TypeDenoter caType = (TypeDenoter) ast.CA.visit(this, used);
+        if (!eType.equals(caType)){
+            reporter.reportError("Incompatible types: ", "", ast.E.position);
+        }
+        ast.type = eType;
+        return ast.type;
+    }
+    /**
+     * VisitElseAggregateExpression
+     * Extended Triangle Compiler
+     * Visita el nodo Else de la expression Case y realiza un análisis contextual del nodo
+     * @param ast -> Arbol sintactico a revisar.
+     * @param o -> objeto que recibe la información de los nodos padre.
+     * @return Devuelve el tipo de dato que resulta la evaluación.
+     */
+    @Override
+    public Object visitElseAggregateExpression(ElseCaseAggregateExpression ast, Object o) {
+        ast.type = (TypeDenoter) ast.E.visit(this, null);
+        return ast.type;
+    }
+    
   // Formal Parameters
 
   // Always returns null. Does not use the given object.

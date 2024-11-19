@@ -15,16 +15,19 @@ import Triangle.AbstractSyntaxTrees.BoolTypeDenoter;
 import Triangle.AbstractSyntaxTrees.CallCommand;
 import Triangle.AbstractSyntaxTrees.CallExpression;
 import Triangle.AbstractSyntaxTrees.CaseCommand;
+import Triangle.AbstractSyntaxTrees.CaseExpression;
 import Triangle.AbstractSyntaxTrees.CharTypeDenoter;
 import Triangle.AbstractSyntaxTrees.CharacterExpression;
 import Triangle.AbstractSyntaxTrees.CharacterLiteral;
 import Triangle.AbstractSyntaxTrees.CharacterLiteralAggregate;
+import Triangle.AbstractSyntaxTrees.CharacterLiteralAggregateExpression;
 import Triangle.AbstractSyntaxTrees.ConstActualParameter;
 import Triangle.AbstractSyntaxTrees.ConstDeclaration;
 import Triangle.AbstractSyntaxTrees.ConstFormalParameter;
 import Triangle.AbstractSyntaxTrees.DotVname;
 import Triangle.AbstractSyntaxTrees.DoWhileCommand;
 import Triangle.AbstractSyntaxTrees.ElseCaseAggregate;
+import Triangle.AbstractSyntaxTrees.ElseCaseAggregateExpression;
 import Triangle.AbstractSyntaxTrees.EmptyActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.EmptyCommand;
 import Triangle.AbstractSyntaxTrees.EmptyExpression;
@@ -41,6 +44,7 @@ import Triangle.AbstractSyntaxTrees.IntTypeDenoter;
 import Triangle.AbstractSyntaxTrees.IntegerExpression;
 import Triangle.AbstractSyntaxTrees.IntegerLiteral;
 import Triangle.AbstractSyntaxTrees.IntegerLiteralAggregate;
+import Triangle.AbstractSyntaxTrees.IntegerLiteralAggregateExpression;
 import Triangle.AbstractSyntaxTrees.LetCommand;
 import Triangle.AbstractSyntaxTrees.LetExpression;
 import Triangle.AbstractSyntaxTrees.MultipleActualParameterSequence;
@@ -217,6 +221,18 @@ public class TreeVisitor implements Visitor {
     
     public Object visitVnameExpression(VnameExpression ast, Object obj) {
         return(createUnary("Vname Expression", ast.V));
+    }
+    /**
+     * VisitCaseExpression
+     * Extended Triangle Compiler
+     * Visita la expresion Case para general el arbol sintactico y se muestre en el IDE Traingle
+     * @param ast
+     * @param obj
+     * @return 
+     */
+    @Override
+    public Object visitCaseExpression(CaseExpression ast, Object o) {
+        return this.createBinary("Case Expression", ast.Vn, ast.Ca);
     }
     // </editor-fold>
     
@@ -508,4 +524,21 @@ public class TreeVisitor implements Visitor {
         return(t);             
     }
     // </editor-fold>
+
+    
+
+    @Override
+    public Object visitIntegerLiteralAggregateExpression(IntegerLiteralAggregateExpression ast, Object o) {
+        return(this.createTernary("IntegerLiteral Aggregate", ast.IL, ast.E, ast.CA));
+    }
+
+    @Override
+    public Object visitCharacterLiteralAggregateExpression(CharacterLiteralAggregateExpression ast, Object o) {
+        return(this.createTernary("IntegerLiteral Aggregate", ast.CL, ast.E, ast.CA));
+    }
+
+    @Override
+    public Object visitElseAggregateExpression(ElseCaseAggregateExpression ast, Object o) {
+        return(this.createUnary("Else Case Aggregate", ast.E));
+    }
 }

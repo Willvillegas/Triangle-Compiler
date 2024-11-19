@@ -35,10 +35,12 @@ import Triangle.AbstractSyntaxTrees.CallCommand;
 import Triangle.AbstractSyntaxTrees.CallExpression;
 import Triangle.AbstractSyntaxTrees.CaseAggregate;
 import Triangle.AbstractSyntaxTrees.CaseCommand;
+import Triangle.AbstractSyntaxTrees.CaseExpression;
 import Triangle.AbstractSyntaxTrees.CharTypeDenoter;
 import Triangle.AbstractSyntaxTrees.CharacterExpression;
 import Triangle.AbstractSyntaxTrees.CharacterLiteral;
 import Triangle.AbstractSyntaxTrees.CharacterLiteralAggregate;
+import Triangle.AbstractSyntaxTrees.CharacterLiteralAggregateExpression;
 import Triangle.AbstractSyntaxTrees.ConstActualParameter;
 import Triangle.AbstractSyntaxTrees.ConstDeclaration;
 import Triangle.AbstractSyntaxTrees.ConstFormalParameter;
@@ -46,6 +48,7 @@ import Triangle.AbstractSyntaxTrees.Declaration;
 import Triangle.AbstractSyntaxTrees.DotVname;
 import Triangle.AbstractSyntaxTrees.DoWhileCommand;
 import Triangle.AbstractSyntaxTrees.ElseCaseAggregate;
+import Triangle.AbstractSyntaxTrees.ElseCaseAggregateExpression;
 import Triangle.AbstractSyntaxTrees.EmptyActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.EmptyCommand;
 import Triangle.AbstractSyntaxTrees.EmptyExpression;
@@ -62,6 +65,7 @@ import Triangle.AbstractSyntaxTrees.IntTypeDenoter;
 import Triangle.AbstractSyntaxTrees.IntegerExpression;
 import Triangle.AbstractSyntaxTrees.IntegerLiteral;
 import Triangle.AbstractSyntaxTrees.IntegerLiteralAggregate;
+import Triangle.AbstractSyntaxTrees.IntegerLiteralAggregateExpression;
 import Triangle.AbstractSyntaxTrees.LetCommand;
 import Triangle.AbstractSyntaxTrees.LetExpression;
 import Triangle.AbstractSyntaxTrees.MultipleActualParameterSequence;
@@ -97,10 +101,11 @@ import Triangle.AbstractSyntaxTrees.Visitor;
 import Triangle.AbstractSyntaxTrees.Vname;
 import Triangle.AbstractSyntaxTrees.VnameExpression;
 import Triangle.AbstractSyntaxTrees.WhileCommand;
+import java.util.ArrayList;
 
 public final class Encoder implements Visitor {
 
-
+    // <editor-fold defaultstate="collapsed" desc=" Commands ">
   // Commands
   public Object visitAssignCommand(AssignCommand ast, Object o) {
     Frame frame = (Frame) o;
@@ -338,7 +343,9 @@ public final class Encoder implements Visitor {
         //emit(Machine.POPop, 0, 0, 1);
         return null;
     }
-
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc=" Expressions ">
   // Expressions
   @Override
   public Object visitArrayExpression(ArrayExpression ast, Object o) {
@@ -432,8 +439,105 @@ public final class Encoder implements Visitor {
     encodeFetch(ast.V, frame, valSize.intValue());
     return valSize;
   }
+  @Override
+    public Object visitCaseExpression(CaseExpression ast, Object o) {
+        /*
+        //me traigo el frame para conocer las variables
+        Frame frame = (Frame) o;
+        //visito el tipo de dato
+        ast.type.visit(this, null);
+        //creo la variable con el posible tamaño de la expression a valorar por defecto en cero
+        Integer valsize;
+        encodeFetch(ast.Vn, frame,Machine.integerSize); // Assuming V is the new Vname attribute
+        valsize = (Integer) ast.Ca.visit(this, frame);
+        //genero los saltos con respecto a los demás nodos
+        //si es integer
+        if (ast.Ca instanceof IntegerLiteralAggregate){
+            for (CaseAggregate current = ast.Ca;(current instanceof IntegerLiteralAggregate); current = ((IntegerLiteralAggregate) current).CA){
+                patch(((IntegerLiteralAggregate)current).jump, nextInstrAddr);
+            }
+        }else {
+            for (CaseAggregate current = ast.Ca;(current instanceof CharacterLiteralAggregate); current = ((CharacterLiteralAggregate) current).CA){
+                patch(((CharacterLiteralAggregate) current).jump, nextInstrAddr);
+            }
+        }
+        //salida del case
+        emit(Machine.POPop, 0, 0, 1);
+        return valsize;*/
+        Integer valSize= (Integer) 0;
+        Frame frame = (Frame) o;
+        
+        ast.type.visit(this, null);
 
+        // Codificar la evaluación del Vname
+        encodeFetch(ast.Vn, frame, 1);
 
+        // Saltos y etiquetas
+        int startAddr = nextInstrAddr;
+        CaseAggregate current = ast.Ca;
+        var jumpPatches = new ArrayList<Integer>();
+
+        while (current != null) {
+            if (current instanceof CharacterLiteralAggregateExpression) {
+                CharacterLiteralAggregateExpression charCase = (CharacterLiteralAggregateExpression) current;
+
+                // Comparar el valor del Vname con el literal del caso actual
+                emit(Machine.LOADLop, 0, 0, characterValuation(charCase.CL.spelling));
+                emit(Machine.CALLop, Machine.STr, Machine.PB, Machine.eqDisplacement);
+
+                // Saltar si coincide
+                int matchAddr = nextInstrAddr;
+                emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, 0);
+
+                // Emitir código para la expresión del caso
+                valSize = ((Integer) charCase.E.visit(this, frame)).intValue();
+                emit(Machine.JUMPop, 0, Machine.CBr, 0); // Saltar al final del case
+                jumpPatches.add(nextInstrAddr - 1);
+
+                // Parchear el salto de no coincidencia
+                patch(matchAddr, nextInstrAddr);
+
+                current = charCase.CA;
+            } else if (current instanceof IntegerLiteralAggregateExpression) {
+                IntegerLiteralAggregateExpression intCase = (IntegerLiteralAggregateExpression) current;
+
+                // Comparar el valor del Vname con el literal del caso actual
+                emit(Machine.LOADLop, 0, 0, Integer.parseInt(intCase.IL.spelling));
+                emit(Machine.CALLop, Machine.STr, Machine.PB, Machine.eqDisplacement);
+
+                // Saltar si coincide
+                int matchAddr = nextInstrAddr;
+                emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, 0);
+
+                // Emitir código para la expresión del caso
+                valSize = ((Integer)intCase.E.visit(this, frame)).intValue();
+                emit(Machine.JUMPop, 0, Machine.CBr, 0); // Saltar al final del case
+                jumpPatches.add(nextInstrAddr - 1);
+
+                // Parchear el salto de no coincidencia
+                patch(matchAddr, nextInstrAddr);
+
+                current = intCase.CA;
+            } else if (current instanceof ElseCaseAggregateExpression) {
+                ElseCaseAggregateExpression elseCase = (ElseCaseAggregateExpression) current;
+
+                // Emitir código para la expresión else
+                valSize = ((Integer)elseCase.E.visit(this, frame)).intValue();
+
+                current = null; // No hay más casos después de else
+            }
+        }
+
+        // Parchear saltos al final
+        for (int addr : jumpPatches) {
+            patch(addr, nextInstrAddr);
+        }
+        System.out.println(valSize.intValue());
+        return valSize;
+    }
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc=" Declarations ">
   // Declarations
   public Object visitBinaryOperatorDeclaration(BinaryOperatorDeclaration ast,
 					       Object o){
@@ -535,8 +639,9 @@ public final class Encoder implements Visitor {
     writeTableDetails(ast);
     return new Integer(extraSize);
   }
+  // </editor-fold>
 
-
+    // <editor-fold defaultstate="collapsed" desc=" Aggregates ">
   // Array Aggregates
   public Object visitMultipleArrayAggregate(MultipleArrayAggregate ast,
 					    Object o) {
@@ -567,7 +672,7 @@ public final class Encoder implements Visitor {
     return ast.E.visit(this, o);
   }
   
-  //Case Aggregate
+  //Case Aggregate (Command)
   @Override
     public Object visitIntegerLiteralAggregate(IntegerLiteralAggregate ast, Object o) {
         Frame frame = (Frame) o;
@@ -654,7 +759,83 @@ public final class Encoder implements Visitor {
         ast.C.visit(this, frame);
         return null;
     }
+   //Case Aggregate (Expression)
+    @Override
+    public Object visitIntegerLiteralAggregateExpression(IntegerLiteralAggregateExpression ast, Object o) {
+        /*Integer valSize;
+        Frame frame = (Frame) o;
+        int jumpIfAddr, jumpPast;
+        
+        //pruebas
+        //ast.type.visit(this, null);
 
+        //emit(Machine.LOADop, 1, Machine.STr, -1);
+        jumpIfAddr = nextInstrAddr;
+        emit(Machine.JUMPIFop, Integer.parseInt(ast.IL.spelling), Machine.CBr, 0);
+        jumpPast = nextInstrAddr;
+        emit(Machine.JUMPop, 0, Machine.CBr, 0);
+        patch(jumpIfAddr, nextInstrAddr);
+        valSize = (Integer) ast.E.visit(this, frame);
+        ast.jump = nextInstrAddr;
+        emit(Machine.JUMPop, 0, Machine.CBr, 0);
+        patch(jumpPast, nextInstrAddr);
+        valSize = (Integer) ast.CA.visit(this, frame);
+        return valSize;/*
+         Frame frame = (Frame) o;
+
+        // Emitir código para cargar el valor del entero en la pila
+        emit(Machine.LOADLop, 0, 0, Integer.parseInt(ast.IL.spelling));
+*/
+        return null;
+    }
+
+    @Override
+    public Object visitCharacterLiteralAggregateExpression(CharacterLiteralAggregateExpression ast, Object o) {
+        /*Integer valSize;
+        /*Frame frame = (Frame) o;
+        int jumpIfAddr, jumpPast;
+        
+        //pruebas
+        //ast.type.visit(this, null);
+        
+        //emit(Machine.LOADop, 1, Machine.STr, -1);
+        jumpIfAddr = nextInstrAddr;
+        emit(Machine.JUMPIFop, characterValuation(ast.CL.spelling), Machine.CBr, 0);
+        jumpPast = nextInstrAddr;
+        emit(Machine.JUMPop, 0, Machine.CBr, 0);
+        patch(jumpIfAddr, nextInstrAddr);
+        valSize = (Integer) ast.E.visit(this, frame);
+        ast.jump = nextInstrAddr;
+        emit(Machine.JUMPop, 0, Machine.CBr, 0);
+        patch(jumpPast, nextInstrAddr);
+        valSize = (Integer) ast.CA.visit(this, frame);
+        return valSize;
+        Frame frame = (Frame) o;
+
+        // Emitir código para cargar el valor del carácter en la pila
+        emit(Machine.LOADLop, 0, 0, characterValuation(ast.CL.spelling));
+        ast.E*/
+
+        return null;
+    }
+
+    @Override
+    public Object visitElseAggregateExpression(ElseCaseAggregateExpression ast, Object o) {
+        /*Integer valSize;
+        Frame frame = (Frame) o;
+        //pruebas
+        ast.type.visit(this, null);
+        valSize = (Integer) ast.E.visit(this, frame);
+        return valSize;*/
+        /*Frame frame = (Frame) o;
+        Integer valSize;
+        // Emitir el código de la expresión asociada al caso `else`
+        valSize = (Integer) ast.E.visit(this, frame);
+
+        return valSize;*/
+        return null;
+    }
+    // </editor-fold>
 
   // Formal Parameters
   public Object visitConstFormalParameter(ConstFormalParameter ast, Object o) {

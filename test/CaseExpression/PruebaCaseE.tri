@@ -1,0 +1,24 @@
+let
+
+    var j : Integer;
+
+    var x : Char 
+
+in
+
+    begin
+    x :='z';
+    j := case x of
+
+        'a' : 43;
+
+        'b' : 2;
+
+	'c' : 5;
+
+	'e' : 20;
+
+        else: 100;
+    putint(j)
+
+    end

@@ -90,6 +90,10 @@ import Triangle.AbstractSyntaxTrees.CaseAggregate;
 import Triangle.AbstractSyntaxTrees.IntegerLiteralAggregate;
 import Triangle.AbstractSyntaxTrees.CharacterLiteralAggregate;
 import Triangle.AbstractSyntaxTrees.ElseCaseAggregate;
+import Triangle.AbstractSyntaxTrees.CaseExpression;
+import Triangle.AbstractSyntaxTrees.IntegerLiteralAggregateExpression;
+import Triangle.AbstractSyntaxTrees.CharacterLiteralAggregateExpression;
+import Triangle.AbstractSyntaxTrees.ElseCaseAggregateExpression;
 
 public class Parser {
 
@@ -391,8 +395,7 @@ public class Parser {
         accept(Token.OF);
         CaseAggregate caAST = parseCaseAggregate();
         finish(commandPos);
-        commandAST = new CaseCommand (vAST,caAST,commandPos);
-        
+        commandAST = new CaseCommand (vAST,caAST,commandPos);        
     }
     break;
     case Token.SEMICOLON:
@@ -488,7 +491,24 @@ public class Parser {
         expressionAST = new IfExpression(e1AST, e2AST, e3AST, expressionPos);
       }
       break;
-
+    /**
+     * Extended Triangle Compiler
+     * CaseExpression       //Ready
+     */
+    /**
+     * case-Expression ::= case V-name of  
+                    ( (Integer-Literal | Character-Literal) : Expression )+ 
+                     end 
+     */
+    case Token.CASE : {
+        acceptIt();
+        Vname vAST = parseVname();
+        accept(Token.OF);
+        CaseAggregate caAST = parseCaseAggregateExpression();
+        finish(expressionPos);
+        expressionAST = new CaseExpression (vAST,caAST,expressionPos);
+    }
+      break;
     default:
       expressionAST = parseSecondaryExpression();
       break;
@@ -670,6 +690,35 @@ public class Parser {
           Command cAST = parseSingleCommand();
           finish(aggregatePos);
           aggregateAST = new ElseCaseAggregate(cAST, aggregatePos);
+      }
+      return aggregateAST;
+  }
+  CaseAggregate parseCaseAggregateExpression() throws SyntaxError {
+      CaseAggregate aggregateAST = null; // in case there's a syntactic error
+      SourcePosition aggregatePos = new SourcePosition();
+      start(aggregatePos);
+      if (currentToken.kind == Token.INTLITERAL) {
+          IntegerLiteral ilAST = parseIntegerLiteral();
+          accept(Token.COLON);
+          Expression eAST = parseExpression();
+          accept(Token.SEMICOLON);
+          CaseAggregate aAST = parseCaseAggregateExpression();
+          finish(aggregatePos);
+          aggregateAST = new IntegerLiteralAggregateExpression(ilAST, eAST, aAST, aggregatePos);
+      } else if (currentToken.kind == Token.CHARLITERAL){
+          CharacterLiteral clAST = parseCharacterLiteral();
+          accept(Token.COLON);
+          Expression eAST = parseExpression();
+          accept(Token.SEMICOLON);
+          CaseAggregate aAST = parseCaseAggregateExpression();
+          finish(aggregatePos);
+          aggregateAST = new CharacterLiteralAggregateExpression(clAST, eAST, aAST, aggregatePos);
+      } else {
+          accept(Token.ELSE);
+          accept(Token.COLON);
+          Expression eAST = parseExpression();
+          finish(aggregatePos);
+          aggregateAST = new ElseCaseAggregateExpression(eAST, aggregatePos);
       }
       return aggregateAST;
   }

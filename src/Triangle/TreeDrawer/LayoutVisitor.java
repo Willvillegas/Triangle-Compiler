@@ -85,10 +85,13 @@ import Triangle.AbstractSyntaxTrees.RepeatCommand;
 import Triangle.AbstractSyntaxTrees.DoWhileCommand;
 import Triangle.AbstractSyntaxTrees.ForCommand;
 import Triangle.AbstractSyntaxTrees.CaseCommand;
-import Triangle.AbstractSyntaxTrees.CaseAggregate;
+import Triangle.AbstractSyntaxTrees.CaseExpression;
 import Triangle.AbstractSyntaxTrees.IntegerLiteralAggregate;
 import Triangle.AbstractSyntaxTrees.CharacterLiteralAggregate;
 import Triangle.AbstractSyntaxTrees.ElseCaseAggregate;
+import Triangle.AbstractSyntaxTrees.IntegerLiteralAggregateExpression;
+import Triangle.AbstractSyntaxTrees.CharacterLiteralAggregateExpression;
+import Triangle.AbstractSyntaxTrees.ElseCaseAggregateExpression;
 
 public class LayoutVisitor implements Visitor {
 
@@ -131,14 +134,17 @@ public class LayoutVisitor implements Visitor {
   }
   
   /*Added by Wilfredo Villegas RepeatUntilCommand*/
+  @Override
   public Object visitRepeatCommand (RepeatCommand ast, Object obj){
       return layoutBinary("Rep.Com.",ast.C,ast.E);
   }
   /*Added by Wilfredo Villegas DoWhileCommand*/
+  @Override
   public Object visitDoWhileCommand (DoWhileCommand ast, Object obj){
       return layoutBinary("DoWhile.Com.",ast.C,ast.E);
   }
   /*Added by Wilfredo Villegas ForCommand*/
+  @Override
   public Object visitForCommand (ForCommand ast, Object obj){
       return layoutQuaternary("For.Com.",ast.Vn,ast.E1,ast.E2,ast.C);
   }
@@ -193,7 +199,11 @@ public class LayoutVisitor implements Visitor {
   public Object visitVnameExpression(VnameExpression ast, Object obj) {
     return layoutUnary("VnameExpr.", ast.V);
   }
-
+  
+    @Override
+    public Object visitCaseExpression(CaseExpression ast, Object o) {
+        return this.layoutBinary("Case.Com", ast.Vn, ast.Ca);
+    }
 
   // Declarations
   public Object visitBinaryOperatorDeclaration(BinaryOperatorDeclaration ast, Object obj) {
@@ -248,7 +258,7 @@ public class LayoutVisitor implements Visitor {
     return layoutBinary("Sing.Rec.Agg.", ast.I, ast.E);
   }
   
-  // Case Aggregate
+  // CaseCommand Aggregates
     @Override
     public Object visitIntegerLiteralAggregate(IntegerLiteralAggregate ast, Object o) {
         return this.layoutTernary("IntLit.Case.Agg", ast.IL, ast.C, ast.CA);
@@ -264,7 +274,22 @@ public class LayoutVisitor implements Visitor {
         return this.layoutUnary("ElseCase.Agg", ast.C);
     }
 
+  // CaseExpression Aggregates
+    @Override
+    public Object visitIntegerLiteralAggregateExpression(IntegerLiteralAggregateExpression ast, Object o) {
+        return this.layoutTernary("IntLit.Case.Agg", ast.IL, ast.E, ast.CA);
+    }
 
+    @Override
+    public Object visitCharacterLiteralAggregateExpression(CharacterLiteralAggregateExpression ast, Object o) {
+        return this.layoutTernary("IntLit.Case.Agg", ast.CL, ast.E, ast.CA);
+    }
+
+    @Override
+    public Object visitElseAggregateExpression(ElseCaseAggregateExpression ast, Object o) {
+        return this.layoutUnary("ElseCase.Agg", ast.E);
+    }  
+  
   // Formal Parameters
   public Object visitConstFormalParameter(ConstFormalParameter ast, Object obj) {
     return layoutBinary("ConstF.P.", ast.I, ast.T);

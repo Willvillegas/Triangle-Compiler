@@ -15,16 +15,19 @@ import Triangle.AbstractSyntaxTrees.BoolTypeDenoter;
 import Triangle.AbstractSyntaxTrees.CallCommand;
 import Triangle.AbstractSyntaxTrees.CallExpression;
 import Triangle.AbstractSyntaxTrees.CaseCommand;
+import Triangle.AbstractSyntaxTrees.CaseExpression;
 import Triangle.AbstractSyntaxTrees.CharTypeDenoter;
 import Triangle.AbstractSyntaxTrees.CharacterExpression;
 import Triangle.AbstractSyntaxTrees.CharacterLiteral;
 import Triangle.AbstractSyntaxTrees.CharacterLiteralAggregate;
+import Triangle.AbstractSyntaxTrees.CharacterLiteralAggregateExpression;
 import Triangle.AbstractSyntaxTrees.ConstActualParameter;
 import Triangle.AbstractSyntaxTrees.ConstDeclaration;
 import Triangle.AbstractSyntaxTrees.ConstFormalParameter;
 import Triangle.AbstractSyntaxTrees.DotVname;
 import Triangle.AbstractSyntaxTrees.DoWhileCommand;
 import Triangle.AbstractSyntaxTrees.ElseCaseAggregate;
+import Triangle.AbstractSyntaxTrees.ElseCaseAggregateExpression;
 import Triangle.AbstractSyntaxTrees.EmptyActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.EmptyCommand;
 import Triangle.AbstractSyntaxTrees.EmptyExpression;
@@ -41,6 +44,7 @@ import Triangle.AbstractSyntaxTrees.IntTypeDenoter;
 import Triangle.AbstractSyntaxTrees.IntegerExpression;
 import Triangle.AbstractSyntaxTrees.IntegerLiteral;
 import Triangle.AbstractSyntaxTrees.IntegerLiteralAggregate;
+import Triangle.AbstractSyntaxTrees.IntegerLiteralAggregateExpression;
 import Triangle.AbstractSyntaxTrees.LetCommand;
 import Triangle.AbstractSyntaxTrees.LetExpression;
 import Triangle.AbstractSyntaxTrees.MultipleActualParameterSequence;
@@ -279,6 +283,16 @@ public class TableVisitor implements Visitor {
       
       return(null);
   }
+  /**
+   * Extended Triangle Compiler
+   * CaseExpression
+   */
+  @Override
+    public Object visitCaseExpression(CaseExpression ast, Object o) {
+        ast.Vn.visit(this, null);
+        ast.Ca.visit(this, null);
+        return null;
+    }
   // </editor-fold>
   
   // <editor-fold defaultstate="collapsed" desc=" Declarations ">
@@ -409,6 +423,10 @@ public class TableVisitor implements Visitor {
       return(null);
   }
   
+  /**
+   * Extended Triangle Compiler
+   * CaseCommand & CaseExpression
+   */
     @Override
     public Object visitIntegerLiteralAggregate(IntegerLiteralAggregate ast, Object o) {
         ast.IL.visit(this, null);
@@ -428,6 +446,27 @@ public class TableVisitor implements Visitor {
     @Override
     public Object visitElseAggregate(ElseCaseAggregate ast, Object o) {
         ast.C.visit(this, null);
+        return null;
+    }
+    @Override
+    public Object visitIntegerLiteralAggregateExpression(IntegerLiteralAggregateExpression ast, Object o) {
+        ast.IL.visit(this, null);
+        ast.E.visit(this, null);
+        ast.CA.visit(this, null);
+        return null;
+    }
+
+    @Override
+    public Object visitCharacterLiteralAggregateExpression(CharacterLiteralAggregateExpression ast, Object o) {
+        ast.CL.visit(this, null);
+        ast.E.visit(this, null);
+        ast.CA.visit(this, null);
+        return null;
+    }
+
+    @Override
+    public Object visitElseAggregateExpression(ElseCaseAggregateExpression ast, Object o) {
+        ast.E.visit(this, null);
         return null;
     }
   // </editor-fold>

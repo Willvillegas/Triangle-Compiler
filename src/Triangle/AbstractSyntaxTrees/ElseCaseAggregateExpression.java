@@ -1,5 +1,5 @@
 /*
- * @(#)ElseCaseAggregate.java                2.1 2024/17/11
+ * @(#)ElseCaseAggregateExpression.java                2.1 2024/18/11
  *
  * Copyright (C) 1999, 2003 D.A. Watt and D.F. Brown
  * Dept. of Computing Science, University of Glasgow, Glasgow G12 8QQ Scotland
@@ -16,17 +16,17 @@ package Triangle.AbstractSyntaxTrees;
 
 import Triangle.SyntacticAnalyzer.SourcePosition;
 
-public class ElseCaseAggregate extends CaseAggregate {
+public class ElseCaseAggregateExpression extends CaseAggregateExpression {
 
-  public ElseCaseAggregate (Command cAST,
+  public ElseCaseAggregateExpression (Expression eAST,
                          SourcePosition thePosition) {
     super (thePosition);
-    C = cAST;
+    E = eAST;
   }
 
   public Object visit(Visitor v, Object o) {
-    return v.visitElseAggregate(this, o);
+    return v.visitElseAggregateExpression(this, o);
   }
 
-  public Command C;
+  public Expression E;
 }

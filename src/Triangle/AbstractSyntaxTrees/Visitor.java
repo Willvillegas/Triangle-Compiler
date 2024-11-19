@@ -43,6 +43,8 @@ public interface Visitor {
   public abstract Object visitRecordExpression(RecordExpression ast, Object o);
   public abstract Object visitUnaryExpression(UnaryExpression ast, Object o);
   public abstract Object visitVnameExpression(VnameExpression ast, Object o);
+  //Extended Triangle Compiler
+  public abstract Object visitCaseExpression(CaseExpression ast, Object o);
 
   // Declarations
   public abstract Object visitBinaryOperatorDeclaration(BinaryOperatorDeclaration ast, Object o);
@@ -62,10 +64,16 @@ public interface Visitor {
   public abstract Object visitMultipleRecordAggregate(MultipleRecordAggregate ast, Object o);
   public abstract Object visitSingleRecordAggregate(SingleRecordAggregate ast, Object o);
   
-  // Case Aggregates
+  // Case Aggregates /*Extended Triangle Compiler*/
+  // Command
   public abstract Object visitIntegerLiteralAggregate(IntegerLiteralAggregate ast,Object o);
   public abstract Object visitCharacterLiteralAggregate(CharacterLiteralAggregate ast,Object o);
   public abstract Object visitElseAggregate(ElseCaseAggregate ast,Object o);
+  //Expression
+  public abstract Object visitIntegerLiteralAggregateExpression(IntegerLiteralAggregateExpression ast,Object o);
+  public abstract Object visitCharacterLiteralAggregateExpression(CharacterLiteralAggregateExpression ast,Object o);
+  public abstract Object visitElseAggregateExpression(ElseCaseAggregateExpression ast,Object o);
+  
 
   // Formal Parameters
   public abstract Object visitConstFormalParameter(ConstFormalParameter ast, Object o);

@@ -23,7 +23,13 @@ public class ErrorReporter {
   ErrorReporter() {
     numErrors = 0;
   }
-
+  
+  /**
+   * reportError: Crea un error en alguna parte del compilador.
+   * @param message Mensaje explicito del error
+   * @param tokenName Nombre del token (El Spelling)
+   * @param pos Posicion en donde está error
+   */
   public void reportError(String message, String tokenName, SourcePosition pos) {
     System.out.print ("ERROR: ");
 

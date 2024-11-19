@@ -1,5 +1,5 @@
 /*
- * @(#)ElseCaseAggregate.java                2.1 2024/17/11
+ * @(#)CaseExpression.java                        2.1 2024/18/11
  *
  * Copyright (C) 1999, 2003 D.A. Watt and D.F. Brown
  * Dept. of Computing Science, University of Glasgow, Glasgow G12 8QQ Scotland
@@ -15,18 +15,23 @@
 package Triangle.AbstractSyntaxTrees;
 
 import Triangle.SyntacticAnalyzer.SourcePosition;
+/**
+ * CaseExpression 
+ * Clase principal para la expresion Case en el Triangle Language
+ * @author Wilfredo Villegas Mendez
+ * 
+ */
+public class CaseExpression extends Expression {
 
-public class ElseCaseAggregate extends CaseAggregate {
-
-  public ElseCaseAggregate (Command cAST,
-                         SourcePosition thePosition) {
+  public CaseExpression (Vname vnAST,CaseAggregate caAST , SourcePosition thePosition) {
     super (thePosition);
-    C = cAST;
+    Vn = vnAST;
+    Ca = caAST;
   }
-
+  
   public Object visit(Visitor v, Object o) {
-    return v.visitElseAggregate(this, o);
+    return v.visitCaseExpression(this, o);
   }
-
-  public Command C;
+  public Vname Vn;
+  public CaseAggregate Ca;
 }

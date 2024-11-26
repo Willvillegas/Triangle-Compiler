@@ -1,0 +1,14 @@
+let
+  type Vector ~ record
+    x: integer,
+    y: integer,
+    norm: func() : Integer ~ x * x + y * y,
+  end;
+  var v: Vector;
+  var result: Integer
+in
+  begin
+    v.x := 3;
+    v.y := 4;
+    result := v.norm()
+  end

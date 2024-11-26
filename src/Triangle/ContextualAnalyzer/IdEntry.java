@@ -16,6 +16,23 @@ package Triangle.ContextualAnalyzer;
 
 import Triangle.AbstractSyntaxTrees.Declaration;
 
+/**
+ * The IdEntry class is used to store the identifiers and their attributes
+ * in the identification table.
+ * The identification table is a stack of entries, each of which contains an identifier,
+ * an attribute, a level, and a link to the previous entry at the same level.
+ * The level is an integer that indicates the current level of the identification table.
+ * The link is a reference to the previous entry at the same level.
+ * The latest field is a reference to the most recent entry in the identification table.
+ * 
+ * Attributes:
+ * - id: the identifier.
+ * - attr: the attribute of the identifier.
+ * - level: the current level of the identification table.
+ * - previous: a reference to the previous entry at the same level.
+ * 
+ */
+
 public class IdEntry {
 
   protected String id;

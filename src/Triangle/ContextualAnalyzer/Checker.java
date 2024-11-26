@@ -822,14 +822,14 @@ public final class Checker implements Visitor {
   public Object visitSimpleTypeDenoter(SimpleTypeDenoter ast, Object o) {
     Declaration binding = (Declaration) ast.I.visit(this, null);
     if (binding == null) {
-      reportUndeclared (ast.I);
-      return StdEnvironment.errorType;
-    } else if (! (binding instanceof TypeDeclaration)) {
-      reporter.reportError ("\"%\" is not a type identifier",
-                            ast.I.spelling, ast.I.position);
-      return StdEnvironment.errorType;
+        reportUndeclared(ast.I);
+        return StdEnvironment.errorType;
+    } else if (binding instanceof TypeDeclaration) {
+        return ((TypeDeclaration) binding).T;
+    } else {
+        reporter.reportError("\"%\" is not a type identifier", ast.I.spelling, ast.I.position);
+        return StdEnvironment.errorType;
     }
-    return ((TypeDeclaration) binding).T;
   }
 
   public Object visitIntTypeDenoter(IntTypeDenoter ast, Object o) {
@@ -838,6 +838,16 @@ public final class Checker implements Visitor {
 
   public Object visitRecordTypeDenoter(RecordTypeDenoter ast, Object o) {
     ast.FT = (FieldTypeDenoter) ast.FT.visit(this, null);
+    if (ast.FD != null){
+        for (var func : ast.FD){
+            func.visit(this, null);
+        }
+    }
+    if (ast.PD != null){
+        for (var proc : ast.PD){
+            proc.visit(this, null);
+        }
+    }
     return ast;
   }
 

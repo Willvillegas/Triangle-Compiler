@@ -11,16 +11,27 @@
  * not be used for commercial purposes without the prior written permission
  * of the authors.
  */
+/**
+ * Extended Triangle Compiler
+ * @author GF-Wilfredo Villegas
+ */
 
 package Triangle.AbstractSyntaxTrees;
 
 import Triangle.SyntacticAnalyzer.SourcePosition;
+import java.util.List;
 
 public class RecordTypeDenoter extends TypeDenoter {
 
   public RecordTypeDenoter (FieldTypeDenoter ftAST, SourcePosition thePosition) {
     super (thePosition);
     FT = ftAST;
+  }
+  public RecordTypeDenoter (FieldTypeDenoter ftAST, List<FuncDeclaration> fdAST,List<ProcDeclaration> pdAST , SourcePosition thePosition) {
+    super (thePosition);
+    FT = ftAST;
+    FD = fdAST;
+    PD = pdAST;
   }
 
   public Object visit (Visitor v, Object o) {
@@ -37,4 +48,6 @@ public class RecordTypeDenoter extends TypeDenoter {
   }
 
   public FieldTypeDenoter FT;
+  public List<FuncDeclaration> FD;
+  public List<ProcDeclaration> PD;
 }

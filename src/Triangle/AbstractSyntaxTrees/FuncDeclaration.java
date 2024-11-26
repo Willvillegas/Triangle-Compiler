@@ -11,6 +11,10 @@
  * not be used for commercial purposes without the prior written permission
  * of the authors.
  */
+/**
+ * Extended triangle compiler
+ * @author GF-Wilfredo Villegas 
+ */
 
 package Triangle.AbstractSyntaxTrees;
 
@@ -27,6 +31,16 @@ public class FuncDeclaration extends Declaration {
     T = tAST;
     E = eAST;
   }
+  public FuncDeclaration (Identifier iAST, FormalParameterSequence fpsAST,
+  		   TypeDenoter tAST, Expression eAST,
+                   SourcePosition thePosition,RecordTypeDenoter rpAST) {
+    super (thePosition);
+    I = iAST;
+    FPS = fpsAST;
+    T = tAST;
+    E = eAST;
+    FR = rpAST;
+  }
 
   public Object visit (Visitor v, Object o) {
     return v.visitFuncDeclaration(this, o);
@@ -36,4 +50,5 @@ public class FuncDeclaration extends Declaration {
   public FormalParameterSequence FPS;
   public TypeDenoter T;
   public Expression E;
+  public RecordTypeDenoter FR;
 }

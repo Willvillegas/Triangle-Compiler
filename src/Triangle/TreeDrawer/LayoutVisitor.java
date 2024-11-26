@@ -215,13 +215,20 @@ public class LayoutVisitor implements Visitor {
   }
 
   public Object visitFuncDeclaration(FuncDeclaration ast, Object obj) {
-    return layoutQuaternary("FuncDecl.", ast.I, ast.FPS, ast.T, ast.E);
+    if (ast.FR != null){
+        return this.layoutQuaternary("FuncRecord.", ast.I, ast.FPS, ast.E, ast.FR);
+    }else{
+        return layoutQuaternary("FuncDecl.", ast.I, ast.FPS, ast.T, ast.E);
+    }    
   }
 
   public Object visitProcDeclaration(ProcDeclaration ast, Object obj) {
-    return layoutTernary("ProcDecl.", ast.I, ast.FPS, ast.C);
+    if (ast.PR != null){
+        return this.layoutQuaternary("ProcRecord.", ast.I, ast.FPS, ast.C, ast.PR);
+    }else{
+        return layoutTernary("ProcDecl.", ast.I, ast.FPS, ast.C);
+    }
   }
-
   public Object visitSequentialDeclaration(SequentialDeclaration ast, Object obj) {
     return layoutBinary("Seq.Decl.", ast.D1, ast.D2);
   }
@@ -393,7 +400,7 @@ public class LayoutVisitor implements Visitor {
   public Object visitSingleFieldTypeDenoter(SingleFieldTypeDenoter ast, Object obj) {
     return layoutBinary("Sing.F.TypeD.", ast.I, ast.T);
   }
-
+  
 
   // Literals, Identifiers and Operators
   public Object visitCharacterLiteral(CharacterLiteral ast, Object obj) {

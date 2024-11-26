@@ -247,11 +247,19 @@ public class TreeVisitor implements Visitor {
     }
     
     public Object visitFuncDeclaration(FuncDeclaration ast, Object obj) {
-        return(createQuaternary("Function Declaration", ast.I, ast.FPS, ast.T, ast.E));
+        if (ast.FR != null){
+            return(createQuaternary("Function Declaration Record", ast.I, ast.FPS, ast.E, ast.FR));
+        }else{
+            return(createQuaternary("Function Declaration", ast.I, ast.FPS, ast.T, ast.E));
+        }
     }
     
     public Object visitProcDeclaration(ProcDeclaration ast, Object obj) {
-        return(createTernary("Procedure Declaration", ast.I, ast.FPS, ast.C));        
+        if (ast.PR != null){
+            return(createQuaternary("Procedure Declaration Record", ast.I, ast.FPS, ast.C, ast.PR));
+        }else{
+            return(createTernary("Procedure Declaration", ast.I, ast.FPS, ast.C));        
+        }
     }
     
     public Object visitSequentialDeclaration(SequentialDeclaration ast, Object obj) {

@@ -92,6 +92,7 @@ import Triangle.AbstractSyntaxTrees.SingleFormalParameterSequence;
 import Triangle.AbstractSyntaxTrees.SingleRecordAggregate;
 import Triangle.AbstractSyntaxTrees.SubscriptVname;
 import Triangle.AbstractSyntaxTrees.TypeDeclaration;
+import Triangle.AbstractSyntaxTrees.TypeDenoter;
 import Triangle.AbstractSyntaxTrees.UnaryExpression;
 import Triangle.AbstractSyntaxTrees.UnaryOperatorDeclaration;
 import Triangle.AbstractSyntaxTrees.VarActualParameter;
@@ -483,6 +484,7 @@ public final class Encoder implements Visitor {
 
                 // Comparar el valor del Vname con el literal del caso actual
                 emit(Machine.LOADLop, 0, 0, characterValuation(charCase.CL.spelling));
+                
                 emit(Machine.CALLop, Machine.STr, Machine.PB, Machine.eqDisplacement);
 
                 // Saltar si coincide
@@ -1019,6 +1021,16 @@ public final class Encoder implements Visitor {
     int typeSize;
     if (ast.entity == null) {
       typeSize = ((Integer) ast.FT.visit(this, new Integer(0))).intValue();
+      if (ast.FD != null){
+        for (var func : ast.FD) {
+            func.visit(this, null);
+        }
+      }
+      if (ast.FD != null){
+        for (var proc : ast.PD) {
+            proc.visit(this, null);
+        }
+      }
       ast.entity = new TypeRepresentation(typeSize);
       writeTableDetails(ast);
     } else
@@ -1060,6 +1072,19 @@ public final class Encoder implements Visitor {
     return new Integer(fieldSize);
   }
 
+
+
+public Object visitTypeDenoter(TypeDenoter ast, Object o) {
+    if (ast instanceof SimpleTypeDenoter) {
+        return visitSimpleTypeDenoter((SimpleTypeDenoter) ast, o);
+    } else if (ast instanceof ArrayTypeDenoter) {
+        return visitArrayTypeDenoter((ArrayTypeDenoter) ast, o);
+    } else if (ast instanceof RecordTypeDenoter) {
+        return visitRecordTypeDenoter((RecordTypeDenoter) ast, o);
+    } else {
+        return visitAnyTypeDenoter((AnyTypeDenoter) ast, o);
+    }
+}
 
   // Literals, Identifiers and Operators
   public Object visitCharacterLiteral(CharacterLiteral ast, Object o) {

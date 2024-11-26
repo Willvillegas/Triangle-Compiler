@@ -94,6 +94,8 @@ import Triangle.AbstractSyntaxTrees.CaseExpression;
 import Triangle.AbstractSyntaxTrees.IntegerLiteralAggregateExpression;
 import Triangle.AbstractSyntaxTrees.CharacterLiteralAggregateExpression;
 import Triangle.AbstractSyntaxTrees.ElseCaseAggregateExpression;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Parser {
 
@@ -296,7 +298,7 @@ public class Parser {
           commandAST = new CallCommand(iAST, apsAST, commandPos);
 
         } else {
-
+          //Becomes ::= V-name := Expression
           Vname vAST = parseRestOfVname(iAST);
           accept(Token.BECOMES);
           Expression eAST = parseExpression();
@@ -1072,9 +1074,48 @@ public class Parser {
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+  
+    private FuncDeclaration parseFuncFieldDeclaration(Identifier id) throws SyntaxError {
+    SourcePosition funcPos = new SourcePosition();
+    start(funcPos);
+
+    accept(Token.LPAREN);
+    FormalParameterSequence fps = parseFormalParameterSequence();
+    accept(Token.RPAREN);
+    accept(Token.COLON);
+    TypeDenoter td = parseTypeDenoter();
+    accept(Token.IS);
+    Expression e = parseExpression();
+
+    finish(funcPos);
+    return new FuncDeclaration(id, fps, td, e, funcPos, null);
+  }
+
+
+  private ProcDeclaration parseProcFieldDeclaration(Identifier id) throws SyntaxError {
+    SourcePosition procPos = new SourcePosition();
+    start(procPos);
+
+    accept(Token.LPAREN);
+    FormalParameterSequence fps = parseFormalParameterSequence();
+    accept(Token.RPAREN);
+    accept(Token.IS);
+    Command c = parseSingleCommand();
+
+    finish(procPos);
+    return new ProcDeclaration(id, fps, c, procPos, null);
+  }
+  
+  
+  
+  
+  
+  
+  
   TypeDenoter parseTypeDenoter() throws SyntaxError {
     TypeDenoter typeAST = null; // in case there's a syntactic error
     SourcePosition typePos = new SourcePosition();
+    
 
     start(typePos);
 
@@ -1100,15 +1141,90 @@ public class Parser {
       break;
 
     case Token.RECORD:
-      {
+      { 
+        /*
         acceptIt();
-        FieldTypeDenoter fAST = parseFieldTypeDenoter();
+        FieldTypeDenoter fAST = null;
+        //Listas de Proc y Func para cada caso
+        List<ProcDeclaration> proc = new ArrayList<>();
+        List<FuncDeclaration> func = new ArrayList<>();
+        while (this.currentToken.kind != Token.END){
+            if (this.currentToken.kind == Token.IDENTIFIER){
+                Identifier iAST = parseIdentifier();
+                accept(Token.COLON);
+                switch (this.currentToken.kind){
+                    case Token.FUNC :{
+                        acceptIt();
+                        FuncDeclaration fdAST = parseFuncDeclaration(iAST);
+                        func.add(fdAST);
+                        accept(Token.COMMA);
+                    }
+                    break;
+                    case Token.PROC :{
+                        acceptIt();
+                        ProcDeclaration pdAST = parseProcDeclaration(iAST);
+                        proc.add(pdAST);
+                        accept(Token.COMMA);
+                    }
+                    break;
+                    default:
+                        TypeDenoter tAST = parseTypeDenoter();
+                        fAST = (fAST != null)?(new MultipleFieldTypeDenoter(iAST,tAST,fAST,this.currentToken.position)) : 
+                                              (new SingleFieldTypeDenoter(iAST,tAST,this.currentToken.position));
+                        accept(Token.COMMA);
+                    break;
+                }
+            }else{
+                syntacticError("\"%\" cannot start a type denoter",
+                currentToken.spelling);
+            }
+        }
+        
+        
         accept(Token.END);
         finish(typePos);
-        typeAST = new RecordTypeDenoter(fAST, typePos);
+        typeAST = new RecordTypeDenoter(fAST,func,proc, typePos);
+        */
+        acceptIt(); // Aceptar "record"
+
+        FieldTypeDenoter fAST = null;
+        List<FuncDeclaration> funcList = new ArrayList<>();
+        List<ProcDeclaration> procList = new ArrayList<>();
+
+        while (currentToken.kind != Token.END) {
+          if (currentToken.kind == Token.IDENTIFIER) {
+            Identifier id = parseIdentifier();
+            accept(Token.COLON);
+
+            if (currentToken.kind == Token.FUNC) {
+              acceptIt();
+              FuncDeclaration funcDecl = parseFuncFieldDeclaration(id);
+              funcList.add(funcDecl);
+              accept(Token.SEMICOLON);
+            } else if (currentToken.kind == Token.PROC) {
+              acceptIt();
+              ProcDeclaration procDecl = parseProcFieldDeclaration(id);
+              procList.add(procDecl);
+              accept(Token.SEMICOLON);
+            } else {
+              TypeDenoter tAST = parseTypeDenoter();
+              if (fAST == null) {
+                fAST = new SingleFieldTypeDenoter(id, tAST, currentToken.position);
+              } else {
+                fAST = new MultipleFieldTypeDenoter(id, tAST, fAST, currentToken.position);
+              }
+              accept(Token.SEMICOLON);
+            }
+          } else {
+            syntacticError("Identifier expected", "");
+          }
+        }
+
+        accept(Token.END); // Aceptar "end" al final del record
+        finish(typePos);
+        typeAST = new RecordTypeDenoter(fAST, funcList, procList, typePos);
       }
       break;
-
     default:
       syntacticError("\"%\" cannot start a type denoter",
         currentToken.spelling);
@@ -1118,7 +1234,7 @@ public class Parser {
     return typeAST;
   }
 
-  FieldTypeDenoter parseFieldTypeDenoter() throws SyntaxError {
+  /*FieldTypeDenoter parseFieldTypeDenoter() throws SyntaxError {
     FieldTypeDenoter fieldAST = null; // in case there's a syntactic error
 
     SourcePosition fieldPos = new SourcePosition();
@@ -1126,7 +1242,9 @@ public class Parser {
     start(fieldPos);
     Identifier iAST = parseIdentifier();
     accept(Token.COLON);
-    TypeDenoter tAST = parseTypeDenoter();
+    System.out.println("Entra recordType con el id " +iAST.spelling);
+    TypeDenoter tAST = parseRecordType(iAST);
+    System.out.println("Sale RecorType");
     if (currentToken.kind == Token.COMMA) {
       acceptIt();
       FieldTypeDenoter fAST = parseFieldTypeDenoter();
@@ -1137,5 +1255,36 @@ public class Parser {
       fieldAST = new SingleFieldTypeDenoter(iAST, tAST, fieldPos);
     }
     return fieldAST;
+  }*/
+
+  
+  ProcDeclaration parseProcDeclaration(Identifier iast) throws SyntaxError{
+      ProcDeclaration pdAST = null;
+      SourcePosition declarationPos = new SourcePosition();
+      start(declarationPos);
+      accept(Token.LPAREN);
+      FormalParameterSequence fpsAST = parseFormalParameterSequence();
+      accept(Token.RPAREN);
+      accept(Token.IS);
+      Command cAST = parseSingleCommand();
+      finish(declarationPos);
+      pdAST = new ProcDeclaration(iast,fpsAST,cAST,declarationPos);
+      return pdAST;
+  }
+  
+  FuncDeclaration parseFuncDeclaration (Identifier iast) throws SyntaxError{
+      FuncDeclaration fdAST = null; //case SyntaxError
+      SourcePosition declarationPos = new SourcePosition();
+      start(declarationPos);
+      accept(Token.LPAREN);
+      FormalParameterSequence fpsAST = parseFormalParameterSequence();
+      accept(Token.RPAREN);
+      accept(Token.COLON);
+      TypeDenoter tAST = parseTypeDenoter();
+      accept(Token.IS);
+      Expression eAST = parseExpression();
+      finish(declarationPos);
+      fdAST = new FuncDeclaration(iast,fpsAST,tAST,eAST,declarationPos);
+      return fdAST;
   }
 }

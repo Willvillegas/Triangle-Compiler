@@ -11,6 +11,10 @@
  * not be used for commercial purposes without the prior written permission
  * of the authors.
  */
+/**
+ * Extended Triangle Compiler
+ * @author GF-Wilfredo Villegas
+ */
 
 package Triangle.AbstractSyntaxTrees;
 
@@ -25,6 +29,14 @@ public class ProcDeclaration extends Declaration {
     FPS = fpsAST;
     C = cAST;
   }
+  public ProcDeclaration (Identifier iAST, FormalParameterSequence fpsAST,
+  		   Command cAST, SourcePosition thePosition,RecordTypeDenoter prAST) {
+    super (thePosition);
+    I = iAST;
+    FPS = fpsAST;
+    C = cAST;
+    PR =prAST;
+  }
 
   public Object visit (Visitor v, Object o) {
     return v.visitProcDeclaration(this, o);
@@ -33,4 +45,5 @@ public class ProcDeclaration extends Declaration {
   public Identifier I;
   public FormalParameterSequence FPS;
   public Command C;
+  public RecordTypeDenoter PR;
 }

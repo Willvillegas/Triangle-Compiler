@@ -14,6 +14,7 @@ import Triangle.AbstractSyntaxTrees.BinaryOperatorDeclaration;
 import Triangle.AbstractSyntaxTrees.BoolTypeDenoter;
 import Triangle.AbstractSyntaxTrees.CallCommand;
 import Triangle.AbstractSyntaxTrees.CallExpression;
+import Triangle.AbstractSyntaxTrees.CallMethodExpression;
 import Triangle.AbstractSyntaxTrees.CaseCommand;
 import Triangle.AbstractSyntaxTrees.CaseExpression;
 import Triangle.AbstractSyntaxTrees.CharTypeDenoter;
@@ -548,5 +549,10 @@ public class TreeVisitor implements Visitor {
     @Override
     public Object visitElseAggregateExpression(ElseCaseAggregateExpression ast, Object o) {
         return(this.createUnary("Else Case Aggregate", ast.E));
+    }
+
+    @Override
+    public Object visitCallMethodExpression(CallMethodExpression ast, Object o) {
+        return this.createTernary("Call Methos Expression", ast.vN, ast.I, ast.APS);
     }
 }

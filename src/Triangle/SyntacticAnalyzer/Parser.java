@@ -94,6 +94,7 @@ import Triangle.AbstractSyntaxTrees.CaseExpression;
 import Triangle.AbstractSyntaxTrees.IntegerLiteralAggregateExpression;
 import Triangle.AbstractSyntaxTrees.CharacterLiteralAggregateExpression;
 import Triangle.AbstractSyntaxTrees.ElseCaseAggregateExpression;
+import Triangle.AbstractSyntaxTrees.CallMethodExpression;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -588,7 +589,19 @@ public class Parser {
           finish(expressionPos);
           expressionAST = new CallExpression(iAST, apsAST, expressionPos);
 
-        } else {
+        } else if(this.currentToken.kind==Token.DOT){
+            this.acceptIt();
+            Identifier  mAST= this.parseIdentifier();
+            ActualParameterSequence apsAST=null;
+            if(this.currentToken.kind== Token.LPAREN){
+                this.acceptIt();
+                apsAST= this.parseActualParameterSequence();
+                this.accept(Token.RPAREN);
+            }
+            this.finish(expressionPos);
+            Vname vAST=this.parseRestOfVname(iAST);
+            expressionAST=new CallMethodExpression(vAST,mAST,apsAST,expressionPos);
+        }else{
           Vname vAST = parseRestOfVname(iAST);
           finish(expressionPos);
           expressionAST = new VnameExpression(vAST, expressionPos);
@@ -749,7 +762,7 @@ public class Parser {
       if (currentToken.kind == Token.DOT) {
         acceptIt();
         Identifier iAST = parseIdentifier();
-        vAST = new DotVname(vAST, iAST, vnamePos);
+        vAST = new DotVname(vAST, iAST, vnamePos);        
       } else {
         acceptIt();
         Expression eAST = parseExpression();
@@ -1142,7 +1155,7 @@ public class Parser {
 
     case Token.RECORD:
       { 
-        /*
+        
         acceptIt();
         FieldTypeDenoter fAST = null;
         //Listas de Proc y Func para cada caso
@@ -1184,7 +1197,7 @@ public class Parser {
         accept(Token.END);
         finish(typePos);
         typeAST = new RecordTypeDenoter(fAST,func,proc, typePos);
-        */
+        /*
         acceptIt(); // Aceptar "record"
 
         FieldTypeDenoter fAST = null;
@@ -1222,7 +1235,7 @@ public class Parser {
 
         accept(Token.END); // Aceptar "end" al final del record
         finish(typePos);
-        typeAST = new RecordTypeDenoter(fAST, funcList, procList, typePos);
+        typeAST = new RecordTypeDenoter(fAST, funcList, procList, typePos);*/
       }
       break;
     default:

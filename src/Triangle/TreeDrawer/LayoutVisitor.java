@@ -26,6 +26,7 @@ import Triangle.AbstractSyntaxTrees.BinaryOperatorDeclaration;
 import Triangle.AbstractSyntaxTrees.BoolTypeDenoter;
 import Triangle.AbstractSyntaxTrees.CallCommand;
 import Triangle.AbstractSyntaxTrees.CallExpression;
+import Triangle.AbstractSyntaxTrees.CallMethodExpression;
 import Triangle.AbstractSyntaxTrees.CharTypeDenoter;
 import Triangle.AbstractSyntaxTrees.CharacterExpression;
 import Triangle.AbstractSyntaxTrees.CharacterLiteral;
@@ -199,10 +200,16 @@ public class LayoutVisitor implements Visitor {
   public Object visitVnameExpression(VnameExpression ast, Object obj) {
     return layoutUnary("VnameExpr.", ast.V);
   }
-  
+  /**
+   * Extended Triangle Compiler
+   */
     @Override
     public Object visitCaseExpression(CaseExpression ast, Object o) {
-        return this.layoutBinary("Case.Com", ast.Vn, ast.Ca);
+        return this.layoutBinary("CaseExpr.", ast.Vn, ast.Ca);
+    }
+  @Override
+    public Object visitCallMethodExpression(CallMethodExpression ast, Object o) {
+        return this.layoutTernary("CallMethodExpr.", ast.vN, ast.I, ast.APS);
     }
 
   // Declarations

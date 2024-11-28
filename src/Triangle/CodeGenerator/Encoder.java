@@ -33,6 +33,7 @@ import Triangle.AbstractSyntaxTrees.BinaryOperatorDeclaration;
 import Triangle.AbstractSyntaxTrees.BoolTypeDenoter;
 import Triangle.AbstractSyntaxTrees.CallCommand;
 import Triangle.AbstractSyntaxTrees.CallExpression;
+import Triangle.AbstractSyntaxTrees.CallMethodExpression;
 import Triangle.AbstractSyntaxTrees.CaseAggregate;
 import Triangle.AbstractSyntaxTrees.CaseCommand;
 import Triangle.AbstractSyntaxTrees.CaseExpression;
@@ -537,6 +538,17 @@ public final class Encoder implements Visitor {
         System.out.println(valSize.intValue());
         return valSize;
     }
+    
+    @Override
+    public Object visitCallMethodExpression(CallMethodExpression ast, Object o) {
+        Frame frame = (Frame) o;
+        Integer valSize = (Integer) ast.type.visit(this, null);
+        ast.APS.visit(this, frame);
+        ast.vN.visit(this, frame);
+        this.emit(Machine.CALLop, Machine.SBr, Machine.CBr,0);
+        return valSize;
+    }
+    
     // </editor-fold>
     
     // <editor-fold defaultstate="collapsed" desc=" Declarations ">

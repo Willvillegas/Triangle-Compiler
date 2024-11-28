@@ -32,6 +32,7 @@ public class RecordTypeDenoter extends TypeDenoter {
     FT = ftAST;
     FD = fdAST;
     PD = pdAST;
+    this.M = M;
   }
 
   public Object visit (Visitor v, Object o) {
@@ -46,8 +47,37 @@ public class RecordTypeDenoter extends TypeDenoter {
     else
       return false;
   }
+  public Declaration findMethod(Identifier methodName) {
+    /*for (Declaration d : this.M) {
+      if (d instanceof FuncDeclaration) {
+        FuncDeclaration func = (FuncDeclaration) d;
+        if (func.I.spelling.equals(methodName.spelling)) {
+          return func;
+        }
+      } else if (d instanceof ProcDeclaration) {
+        ProcDeclaration proc = (ProcDeclaration) d;
+        if (proc.I.spelling.equals(methodName.spelling)) {
+          return proc;
+        }
+      }
+    }*/
+    if(this.FD != null){
+        for(FuncDeclaration d :this.FD){
+            if (d.I.spelling.equals(methodName.spelling))
+                return d;
+        }
+    }
+    if (this.PD !=null){
+        for(ProcDeclaration d :this.PD){
+            if (d.I.spelling.equals(methodName.spelling))
+                return d;
+        }
+    }
+    return null;
+  }
 
   public FieldTypeDenoter FT;
   public List<FuncDeclaration> FD;
   public List<ProcDeclaration> PD;
+  public List<Declaration> M;
 }

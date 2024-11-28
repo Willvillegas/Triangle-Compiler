@@ -99,6 +99,7 @@ import Triangle.AbstractSyntaxTrees.VnameExpression;
 import Triangle.AbstractSyntaxTrees.WhileCommand;
 import Triangle.SyntacticAnalyzer.SourcePosition;
 import java.util.ArrayList;
+import Triangle.AbstractSyntaxTrees.CallMethodExpression;
 
 public final class Checker implements Visitor {
 
@@ -402,7 +403,24 @@ public final class Checker implements Visitor {
         ast.type = caType;
         return ast.type;
     }
-
+    
+    @Override
+    public Object visitCallMethodExpression(CallMethodExpression ast, Object o) {
+        TypeDenoter recType =(TypeDenoter) ast.vN.visit(this, null);
+        if(! (recType instanceof RecordTypeDenoter)){
+            reporter.reportError("The variable is not a record type", "", ast.position);
+            return null;
+        }
+        
+        var record = (RecordTypeDenoter) recType;
+        Declaration methodDecl = record.findMethod(ast.I);
+        if (methodDecl == null) {
+            reporter.reportError("The method \"" + ast.I.spelling + "\" is not defined in the record", "", ast.position);
+            return null;
+        }
+        ast.type = recType;
+        return ast.type;
+    }
   // Declarations
 
   // Always returns null. Does not use the given object.

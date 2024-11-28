@@ -14,6 +14,7 @@ import Triangle.AbstractSyntaxTrees.BinaryOperatorDeclaration;
 import Triangle.AbstractSyntaxTrees.BoolTypeDenoter;
 import Triangle.AbstractSyntaxTrees.CallCommand;
 import Triangle.AbstractSyntaxTrees.CallExpression;
+import Triangle.AbstractSyntaxTrees.CallMethodExpression;
 import Triangle.AbstractSyntaxTrees.CaseCommand;
 import Triangle.AbstractSyntaxTrees.CaseExpression;
 import Triangle.AbstractSyntaxTrees.CharTypeDenoter;
@@ -286,11 +287,19 @@ public class TableVisitor implements Visitor {
   /**
    * Extended Triangle Compiler
    * CaseExpression
+   * CallMethodExpression
    */
   @Override
     public Object visitCaseExpression(CaseExpression ast, Object o) {
         ast.Vn.visit(this, null);
         ast.Ca.visit(this, null);
+        return null;
+    }
+    @Override
+    public Object visitCallMethodExpression(CallMethodExpression ast, Object o) {
+        ast.vN.visit(this, null);
+        ast.I.visit(this, null);
+        ast.APS.visit(this, null);
         return null;
     }
   // </editor-fold>

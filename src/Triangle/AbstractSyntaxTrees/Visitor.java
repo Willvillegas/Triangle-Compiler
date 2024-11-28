@@ -45,6 +45,7 @@ public interface Visitor {
   public abstract Object visitVnameExpression(VnameExpression ast, Object o);
   //Extended Triangle Compiler
   public abstract Object visitCaseExpression(CaseExpression ast, Object o);
+  public abstract Object visitCallMethodExpression(CallMethodExpression ast, Object o);
 
   // Declarations
   public abstract Object visitBinaryOperatorDeclaration(BinaryOperatorDeclaration ast, Object o);

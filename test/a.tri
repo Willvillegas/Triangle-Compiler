@@ -1,11 +1,11 @@
 let
   type Vector ~ record
-    x: integer;
-    y: integer;
-    norm: func() : integer ~ x * x + y * y;
+    x: Integer;
+    y: Integer;
+    norm: func() : Integer ~ x * x + y * y;
   end;
   var v: Vector;
-  var result: integer
+  var result: Integer
 in
   begin
     v.x := 3;

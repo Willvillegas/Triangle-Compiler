@@ -1,7 +1,7 @@
 let
   type Vector ~ record
-    x: integer,
-    y: integer,
+    x: Integer,
+    y: Integer,
     norm: func() : Integer ~ x * x + y * y,
   end;
   var v: Vector;
@@ -10,5 +10,5 @@ in
   begin
     v.x := 3;
     v.y := 4;
-    result := v.norm()
+    !result := v.norm()
   end

@@ -1,9 +1,16 @@
 test/**/*.tam
 # NetBeans
-nbproject/private/
+**/nbproject/private/
+**/nbproject/Makefile-*.mk
+**/nbproject/Package-*.bash
 build/
+nbbuild/
 dist/
-build/
+nbdist/
+#/nbproject/*
+#build/
+#dist/
+#build/
 
 # Java
 *.class

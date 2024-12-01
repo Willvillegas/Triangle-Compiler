@@ -137,6 +137,9 @@ public final class Scanner {
       if (currentChar == '=') {
         takeIt();
         return Token.BECOMES;
+      } else if (this.currentChar == ':'){
+          this.takeIt();
+          return Token.COLOND;
       } else
         return Token.COLON;
 

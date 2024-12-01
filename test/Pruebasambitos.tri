@@ -1,0 +1,16 @@
+let
+  type Vector ~ record
+    x: Integer,
+    y: Integer
+  end;
+  var v: Vector;
+  var result: Integer;
+  proc hola(x:Integer)~putint(x)
+in
+  begin
+    v.x := 3;
+    v.y := 4;
+    !result := v.norm()
+    !result:= hi(result)
+    hola(4);
+  end

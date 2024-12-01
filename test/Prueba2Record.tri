@@ -3,12 +3,16 @@ let
     x: Integer,
     y: Integer,
     norm: func() : Integer ~ x * x + y * y,
+    narma: proc () ~ put(' ')
   end;
   var v: Vector;
-  var result: Integer
+  var result: Integer;
+  func hi (i:Integer) : Integer ~ i+1
 in
   begin
     v.x := 3;
     v.y := 4;
-    !result := v.norm()
+    result := v::norm();
+    result:= hi(result);
+    putint(result)
   end

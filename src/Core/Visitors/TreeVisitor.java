@@ -38,6 +38,7 @@ import Triangle.AbstractSyntaxTrees.ForCommand;
 import Triangle.AbstractSyntaxTrees.FuncActualParameter;
 import Triangle.AbstractSyntaxTrees.FuncDeclaration;
 import Triangle.AbstractSyntaxTrees.FuncFormalParameter;
+import Triangle.AbstractSyntaxTrees.FuncTypeDenoter;
 import Triangle.AbstractSyntaxTrees.Identifier;
 import Triangle.AbstractSyntaxTrees.IfCommand;
 import Triangle.AbstractSyntaxTrees.IfExpression;
@@ -57,6 +58,7 @@ import Triangle.AbstractSyntaxTrees.Operator;
 import Triangle.AbstractSyntaxTrees.ProcActualParameter;
 import Triangle.AbstractSyntaxTrees.ProcDeclaration;
 import Triangle.AbstractSyntaxTrees.ProcFormalParameter;
+import Triangle.AbstractSyntaxTrees.ProcTypeDenoter;
 import Triangle.AbstractSyntaxTrees.Program;
 import Triangle.AbstractSyntaxTrees.RecordExpression;
 import Triangle.AbstractSyntaxTrees.RecordTypeDenoter;
@@ -554,5 +556,16 @@ public class TreeVisitor implements Visitor {
     @Override
     public Object visitCallMethodExpression(CallMethodExpression ast, Object o) {
         return this.createTernary("Call Methos Expression", ast.vN, ast.I, ast.APS);
+    }
+
+    @Override
+    public Object visitProcTypeDenoter(ProcTypeDenoter ast, Object o) {
+        return this.createBinary("ProcTypeD", ast.FPS, ast.C);
+    }
+
+    @Override
+    public Object visitFuncTypeDenoter(FuncTypeDenoter ast, Object o) {
+        
+        return this.createTernary("FuncTypeD", ast.FPS, ast.T, ast.E);
     }
 }

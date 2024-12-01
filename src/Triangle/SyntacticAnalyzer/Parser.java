@@ -95,6 +95,8 @@ import Triangle.AbstractSyntaxTrees.IntegerLiteralAggregateExpression;
 import Triangle.AbstractSyntaxTrees.CharacterLiteralAggregateExpression;
 import Triangle.AbstractSyntaxTrees.ElseCaseAggregateExpression;
 import Triangle.AbstractSyntaxTrees.CallMethodExpression;
+import Triangle.AbstractSyntaxTrees.FuncTypeDenoter;
+import Triangle.AbstractSyntaxTrees.ProcTypeDenoter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -589,7 +591,7 @@ public class Parser {
           finish(expressionPos);
           expressionAST = new CallExpression(iAST, apsAST, expressionPos);
 
-        } else if(this.currentToken.kind==Token.DOT){
+        } else if(this.currentToken.kind==Token.COLOND){
             this.acceptIt();
             Identifier  mAST= this.parseIdentifier();
             ActualParameterSequence apsAST=null;
@@ -606,6 +608,19 @@ public class Parser {
           finish(expressionPos);
           expressionAST = new VnameExpression(vAST, expressionPos);
         }
+        /*Identifier iAST= parseIdentifier();
+        if (currentToken.kind == Token.LPAREN) {
+          acceptIt();
+          ActualParameterSequence apsAST = parseActualParameterSequence();
+          accept(Token.RPAREN);
+          finish(expressionPos);
+          expressionAST = new CallExpression(iAST, apsAST, expressionPos);
+
+        } else {
+          Vname vAST = parseRestOfVname(iAST);
+          finish(expressionPos);
+          expressionAST = new VnameExpression(vAST, expressionPos);
+        }*/
       }
       break;
 
@@ -1086,7 +1101,7 @@ public class Parser {
 // TYPE-DENOTERS
 //
 ///////////////////////////////////////////////////////////////////////////////
-
+/*
   
     private FuncDeclaration parseFuncFieldDeclaration(Identifier id) throws SyntaxError {
     SourcePosition funcPos = new SourcePosition();
@@ -1119,7 +1134,7 @@ public class Parser {
     return new ProcDeclaration(id, fps, c, procPos, null);
   }
   
-  
+  */
   
   
   
@@ -1156,11 +1171,11 @@ public class Parser {
     case Token.RECORD:
       { 
         
-        acceptIt();
+        /*acceptIt();
         FieldTypeDenoter fAST = null;
         //Listas de Proc y Func para cada caso
-        List<ProcDeclaration> proc = new ArrayList<>();
-        List<FuncDeclaration> func = new ArrayList<>();
+        //List<ProcDeclaration> proc = new ArrayList<>();
+        //List<FuncDeclaration> func = new ArrayList<>();
         while (this.currentToken.kind != Token.END){
             if (this.currentToken.kind == Token.IDENTIFIER){
                 Identifier iAST = parseIdentifier();
@@ -1168,15 +1183,16 @@ public class Parser {
                 switch (this.currentToken.kind){
                     case Token.FUNC :{
                         acceptIt();
-                        FuncDeclaration fdAST = parseFuncDeclaration(iAST);
-                        func.add(fdAST);
+                        
+                        //FuncDeclaration fdAST = parseFuncDeclaration(iAST);
+                        //func.add(fdAST);
                         accept(Token.COMMA);
                     }
                     break;
                     case Token.PROC :{
                         acceptIt();
-                        ProcDeclaration pdAST = parseProcDeclaration(iAST);
-                        proc.add(pdAST);
+                        //ProcDeclaration pdAST = parseProcDeclaration(iAST);
+                        //proc.add(pdAST);
                         accept(Token.COMMA);
                     }
                     break;
@@ -1236,8 +1252,39 @@ public class Parser {
         accept(Token.END); // Aceptar "end" al final del record
         finish(typePos);
         typeAST = new RecordTypeDenoter(fAST, funcList, procList, typePos);*/
+        acceptIt();
+        FieldTypeDenoter fAST = parseFieldTypeDenoter();
+        accept(Token.END);
+        finish(typePos);
+        typeAST = new RecordTypeDenoter(fAST, typePos);
       }
       break;
+    
+    case Token.FUNC :{
+        this.acceptIt();
+        accept(Token.LPAREN);
+        FormalParameterSequence fpsAST = parseFormalParameterSequence();
+        accept(Token.RPAREN);
+        accept(Token.COLON);
+        TypeDenoter tdAST = parseTypeDenoter();
+        accept(Token.IS);
+        Expression eAST = parseExpression();
+        finish(typePos);
+        typeAST = new FuncTypeDenoter(fpsAST,tdAST,eAST,typePos);
+    }
+    break;
+    
+    case Token.PROC :{
+        this.acceptIt();
+        accept(Token.LPAREN);
+        FormalParameterSequence fpsAST = parseFormalParameterSequence();
+        accept(Token.RPAREN);
+        accept(Token.IS);
+        Command cAST = parseSingleCommand();
+        finish(typePos);
+        typeAST = new ProcTypeDenoter(fpsAST,cAST,typePos);
+    }
+    break;
     default:
       syntacticError("\"%\" cannot start a type denoter",
         currentToken.spelling);
@@ -1247,7 +1294,7 @@ public class Parser {
     return typeAST;
   }
 
-  /*FieldTypeDenoter parseFieldTypeDenoter() throws SyntaxError {
+  FieldTypeDenoter parseFieldTypeDenoter() throws SyntaxError {
     FieldTypeDenoter fieldAST = null; // in case there's a syntactic error
 
     SourcePosition fieldPos = new SourcePosition();
@@ -1255,9 +1302,7 @@ public class Parser {
     start(fieldPos);
     Identifier iAST = parseIdentifier();
     accept(Token.COLON);
-    System.out.println("Entra recordType con el id " +iAST.spelling);
-    TypeDenoter tAST = parseRecordType(iAST);
-    System.out.println("Sale RecorType");
+    TypeDenoter tAST = parseTypeDenoter();//parseRecordType(iAST);
     if (currentToken.kind == Token.COMMA) {
       acceptIt();
       FieldTypeDenoter fAST = parseFieldTypeDenoter();
@@ -1268,9 +1313,9 @@ public class Parser {
       fieldAST = new SingleFieldTypeDenoter(iAST, tAST, fieldPos);
     }
     return fieldAST;
-  }*/
+  }
 
-  
+  /*
   ProcDeclaration parseProcDeclaration(Identifier iast) throws SyntaxError{
       ProcDeclaration pdAST = null;
       SourcePosition declarationPos = new SourcePosition();
@@ -1299,5 +1344,5 @@ public class Parser {
       finish(declarationPos);
       fdAST = new FuncDeclaration(iast,fpsAST,tAST,eAST,declarationPos);
       return fdAST;
-  }
+  }*/
 }

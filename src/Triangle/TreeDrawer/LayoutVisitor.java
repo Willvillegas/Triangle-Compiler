@@ -93,6 +93,8 @@ import Triangle.AbstractSyntaxTrees.ElseCaseAggregate;
 import Triangle.AbstractSyntaxTrees.IntegerLiteralAggregateExpression;
 import Triangle.AbstractSyntaxTrees.CharacterLiteralAggregateExpression;
 import Triangle.AbstractSyntaxTrees.ElseCaseAggregateExpression;
+import Triangle.AbstractSyntaxTrees.FuncTypeDenoter;
+import Triangle.AbstractSyntaxTrees.ProcTypeDenoter;
 
 public class LayoutVisitor implements Visitor {
 
@@ -624,5 +626,15 @@ public class LayoutVisitor implements Visitor {
 
     return r;
   }
+
+    @Override
+    public Object visitProcTypeDenoter(ProcTypeDenoter ast, Object o) {
+        return this.layoutBinary("ProcTypeD", ast.FPS, ast.C);
+    }
+
+    @Override
+    public Object visitFuncTypeDenoter(FuncTypeDenoter ast, Object o) {
+        return this.layoutTernary("FuncTypeD", ast.T, ast.FPS, ast.E);
+    }
 
 }

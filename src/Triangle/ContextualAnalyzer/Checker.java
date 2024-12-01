@@ -100,6 +100,8 @@ import Triangle.AbstractSyntaxTrees.WhileCommand;
 import Triangle.SyntacticAnalyzer.SourcePosition;
 import java.util.ArrayList;
 import Triangle.AbstractSyntaxTrees.CallMethodExpression;
+import Triangle.AbstractSyntaxTrees.FuncTypeDenoter;
+import Triangle.AbstractSyntaxTrees.ProcTypeDenoter;
 
 public final class Checker implements Visitor {
 
@@ -406,20 +408,21 @@ public final class Checker implements Visitor {
     
     @Override
     public Object visitCallMethodExpression(CallMethodExpression ast, Object o) {
-        TypeDenoter recType =(TypeDenoter) ast.vN.visit(this, null);
+        /*TypeDenoter recType =(TypeDenoter) ast.vN.visit(this, null);
         if(! (recType instanceof RecordTypeDenoter)){
             reporter.reportError("The variable is not a record type", "", ast.position);
             return null;
         }
         
         var record = (RecordTypeDenoter) recType;
-        Declaration methodDecl = record.findMethod(ast.I);
+        //Declaration methodDecl = record.findMethod(ast.I);
         if (methodDecl == null) {
             reporter.reportError("The method \"" + ast.I.spelling + "\" is not defined in the record", "", ast.position);
             return null;
         }
         ast.type = recType;
-        return ast.type;
+        return ast.type;*/
+        return null;
     }
   // Declarations
 
@@ -853,10 +856,10 @@ public final class Checker implements Visitor {
   public Object visitIntTypeDenoter(IntTypeDenoter ast, Object o) {
     return StdEnvironment.integerType;
   }
-
+  
   public Object visitRecordTypeDenoter(RecordTypeDenoter ast, Object o) {
     ast.FT = (FieldTypeDenoter) ast.FT.visit(this, null);
-    if (ast.FD != null){
+    /*if (ast.FD != null){
         for (var func : ast.FD){
             func.visit(this, null);
         }
@@ -865,18 +868,27 @@ public final class Checker implements Visitor {
         for (var proc : ast.PD){
             proc.visit(this, null);
         }
-    }
+    }*/
     return ast;
   }
 
   public Object visitMultipleFieldTypeDenoter(MultipleFieldTypeDenoter ast, Object o) {
     ast.T = (TypeDenoter) ast.T.visit(this, null);
+    //Montar una validación de que si es un functypedenoter pase al otro
+    /**/
+    /*if (ast.T instanceof FuncTypeDenoter){
+        ast.T = (TypeDenoter) ast.T.visit(this, null);
+    }*/
+    
     ast.FT.visit(this, null);
     return ast;
   }
 
   public Object visitSingleFieldTypeDenoter(SingleFieldTypeDenoter ast, Object o) {
     ast.T = (TypeDenoter) ast.T.visit(this, null);
+    /*if (ast.T instanceof FuncTypeDenoter){
+        ast.T = (TypeDenoter) ast.T.visit(this, null);
+    }*/
     return ast;
   }
 
@@ -1182,4 +1194,33 @@ public final class Checker implements Visitor {
     StdEnvironment.unequalDecl = declareStdBinaryOp("\\=", StdEnvironment.anyType, StdEnvironment.anyType, StdEnvironment.booleanType);
 
   }
+
+    @Override
+    public Object visitProcTypeDenoter(ProcTypeDenoter ast, Object o) {
+        /*ast.T = (TypeDenoter) ast.T.visit(this, null);
+        ast.FPS.visit(this, null);
+        ast.C.visit(this, null);*/
+        //mm
+        ast.T = new AnyTypeDenoter(dummyPos);
+        ast.FPS.visit(this, null);
+        ast.C.visit(this, null);
+        return ast.T;
+    }
+
+    @Override
+    public Object visitFuncTypeDenoter(FuncTypeDenoter ast, Object o) {
+        /*ast.T= (TypeDenoter) ast.T.visit(this, null);
+        //this.idTable.enter("", ast);
+        this.idTable.openScope();
+        ast.FPS.visit(this, null);
+        ast.E.visit(this, null);
+        this.idTable.closeScope();*/
+        // Verificar la secuencia de parámetros formales
+        ast.T = (TypeDenoter) ast.T.visit(this, null);
+        ast.FPS.visit(this, null);
+        // no se puede debido a que las expresiones locales todavía no están implementadas en al tabla de identificación
+        //ast.E.visit(this, null);
+        // Verificar el tipo de retorno
+        return ast.T;
+    }
 }

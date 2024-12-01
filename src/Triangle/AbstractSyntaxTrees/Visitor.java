@@ -105,6 +105,8 @@ public interface Visitor {
   public abstract Object visitSimpleTypeDenoter(SimpleTypeDenoter ast, Object o);
   public abstract Object visitIntTypeDenoter(IntTypeDenoter ast, Object o);
   public abstract Object visitRecordTypeDenoter(RecordTypeDenoter ast, Object o);
+  public abstract Object visitProcTypeDenoter(ProcTypeDenoter ast,Object o);
+  public abstract Object visitFuncTypeDenoter(FuncTypeDenoter ast,Object o);
 
   public abstract Object visitMultipleFieldTypeDenoter(MultipleFieldTypeDenoter ast, Object o);
   public abstract Object visitSingleFieldTypeDenoter(SingleFieldTypeDenoter ast, Object o);

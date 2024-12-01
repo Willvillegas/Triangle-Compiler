@@ -38,6 +38,7 @@ import Triangle.AbstractSyntaxTrees.ForCommand;
 import Triangle.AbstractSyntaxTrees.FuncActualParameter;
 import Triangle.AbstractSyntaxTrees.FuncDeclaration;
 import Triangle.AbstractSyntaxTrees.FuncFormalParameter;
+import Triangle.AbstractSyntaxTrees.FuncTypeDenoter;
 import Triangle.AbstractSyntaxTrees.Identifier;
 import Triangle.AbstractSyntaxTrees.IfCommand;
 import Triangle.AbstractSyntaxTrees.IfExpression;
@@ -57,6 +58,7 @@ import Triangle.AbstractSyntaxTrees.Operator;
 import Triangle.AbstractSyntaxTrees.ProcActualParameter;
 import Triangle.AbstractSyntaxTrees.ProcDeclaration;
 import Triangle.AbstractSyntaxTrees.ProcFormalParameter;
+import Triangle.AbstractSyntaxTrees.ProcTypeDenoter;
 import Triangle.AbstractSyntaxTrees.Program;
 import Triangle.AbstractSyntaxTrees.RecordExpression;
 import Triangle.AbstractSyntaxTrees.RecordTypeDenoter;
@@ -644,7 +646,7 @@ public class TableVisitor implements Visitor {
   public Object visitMultipleFieldTypeDenoter(MultipleFieldTypeDenoter ast, Object o) { 
       try {
       addIdentifier(ast.I.spelling, 
-              "Field", 
+              "Field Record", 
               (ast.entity!=null?ast.entity.size:0),
               -1, ((Field)ast.entity).fieldOffset, -1);      
     } catch (NullPointerException e) { }
@@ -659,7 +661,7 @@ public class TableVisitor implements Visitor {
   public Object visitSingleFieldTypeDenoter(SingleFieldTypeDenoter ast, Object o) { 
       try {
       addIdentifier(ast.I.spelling, 
-              "Field", 
+              "Field Record", 
               (ast.entity!=null?ast.entity.size:0),
               -1, ((Field)ast.entity).fieldOffset, -1);
       } catch (NullPointerException e) { }
@@ -759,4 +761,19 @@ public class TableVisitor implements Visitor {
   // <editor-fold defaultstate="collapsed" desc=" Attributes ">
     private DefaultTableModel model;
     // </editor-fold>
+
+    @Override
+    public Object visitProcTypeDenoter(ProcTypeDenoter ast, Object o) {
+        ast.FPS.visit(this, null);
+        ast.C.visit(this, null);
+        return null;
+    }
+
+    @Override
+    public Object visitFuncTypeDenoter(FuncTypeDenoter ast, Object o) {
+        ast.FPS.visit(this, null);
+        ast.T.visit(this, null);
+        ast.E.visit(this, null);
+        return null;
+    }
 }

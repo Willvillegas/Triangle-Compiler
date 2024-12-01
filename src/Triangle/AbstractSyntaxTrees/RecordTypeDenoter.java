@@ -47,7 +47,7 @@ public class RecordTypeDenoter extends TypeDenoter {
     else
       return false;
   }
-  public Declaration findMethod(Identifier methodName) {
+  //public Declaration findMethod(Identifier methodName) {
     /*for (Declaration d : this.M) {
       if (d instanceof FuncDeclaration) {
         FuncDeclaration func = (FuncDeclaration) d;
@@ -61,7 +61,7 @@ public class RecordTypeDenoter extends TypeDenoter {
         }
       }
     }*/
-    if(this.FD != null){
+    /*if(this.FD != null){
         for(FuncDeclaration d :this.FD){
             if (d.I.spelling.equals(methodName.spelling))
                 return d;
@@ -74,7 +74,7 @@ public class RecordTypeDenoter extends TypeDenoter {
         }
     }
     return null;
-  }
+  }*/
 
   public FieldTypeDenoter FT;
   public List<FuncDeclaration> FD;

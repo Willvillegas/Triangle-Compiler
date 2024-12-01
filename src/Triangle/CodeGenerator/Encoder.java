@@ -59,6 +59,7 @@ import Triangle.AbstractSyntaxTrees.ForCommand;
 import Triangle.AbstractSyntaxTrees.FuncActualParameter;
 import Triangle.AbstractSyntaxTrees.FuncDeclaration;
 import Triangle.AbstractSyntaxTrees.FuncFormalParameter;
+import Triangle.AbstractSyntaxTrees.FuncTypeDenoter;
 import Triangle.AbstractSyntaxTrees.Identifier;
 import Triangle.AbstractSyntaxTrees.IfCommand;
 import Triangle.AbstractSyntaxTrees.IfExpression;
@@ -78,6 +79,7 @@ import Triangle.AbstractSyntaxTrees.Operator;
 import Triangle.AbstractSyntaxTrees.ProcActualParameter;
 import Triangle.AbstractSyntaxTrees.ProcDeclaration;
 import Triangle.AbstractSyntaxTrees.ProcFormalParameter;
+import Triangle.AbstractSyntaxTrees.ProcTypeDenoter;
 import Triangle.AbstractSyntaxTrees.Program;
 import Triangle.AbstractSyntaxTrees.RecordExpression;
 import Triangle.AbstractSyntaxTrees.RecordTypeDenoter;
@@ -1483,4 +1485,46 @@ public Object visitTypeDenoter(TypeDenoter ast, Object o) {
       }
     }
   }
+
+    @Override
+    public Object visitProcTypeDenoter(ProcTypeDenoter ast, Object o) {
+        Frame frame = (Frame) o;
+        int argsSize = ((Integer) ast.FPS.visit(this, frame)).intValue();
+        Frame frame1 = new Frame(frame.level + 1, argsSize);
+        ast.C.visit(this, frame1);
+        // Generate appropriate code for procedure type denoter
+        return Integer.valueOf(0);
+    }
+
+    @Override
+    public Object visitFuncTypeDenoter(FuncTypeDenoter ast, Object o) {
+      /*Frame frame = (Frame) o;
+      int argsSize = ((Integer) ast.FPS.visit(this, frame)).intValue();
+      Frame frame1 = new Frame(frame.level + 1, argsSize);
+      ast.T.visit(this, frame1);
+      ast.E.visit(this, frame1);
+      // Generate appropriate code for function type denoter
+      return Integer.valueOf(0);*/
+      int typeSize = 0; // Puedes ajustar el cálculo del tamaño según tus necesidades
+
+      // Visitar la secuencia de parámetros formales
+      if (ast.FPS != null) {
+        typeSize += ((Integer) ast.FPS.visit(this, null)).intValue();
+      }
+
+      // Visitar el tipo de retorno
+      if (ast.T != null) {
+        typeSize += ((Integer) ast.T.visit(this, null)).intValue();
+      }
+
+      // Establecer la entidad del tipo si no está ya definida
+      if (ast.entity == null) {
+        ast.entity = new TypeRepresentation(typeSize);
+        writeTableDetails(ast);
+      } else {
+        typeSize = ast.entity.size;
+      }
+
+      return new Integer(typeSize); // Devuelve el tamaño del tipo de la función
+    }
 }

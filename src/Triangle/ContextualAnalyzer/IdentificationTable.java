@@ -15,6 +15,7 @@
 package Triangle.ContextualAnalyzer;
 
 import Triangle.AbstractSyntaxTrees.Declaration;
+import Triangle.AbstractSyntaxTrees.FieldTypeDenoter;
 /**
  * The IdentificationTable class is used to store the identifiers and their attributes
  * in the identification table. 
@@ -104,6 +105,27 @@ public final class IdentificationTable {
     entry = new IdEntry(id, attr, this.level, this.latest);
     this.latest = entry;
   }
+  public void enterTypeDenoter (String id, FieldTypeDenoter attrtype) {
+
+    IdEntry entry = this.latest;
+    boolean present = false, searching = true;
+
+    // Check for duplicate entry ...
+    while (searching) {
+      if (entry == null || entry.level < this.level)
+        searching = false;
+      else if (entry.id.equals(id)) {
+        present = true;
+        searching = false;
+       } else
+       entry = entry.previous;
+    }
+    //no valida la duplicidad de los fieldrecords
+    //attr.duplicated = present;
+    // Add new entry ...
+    entry = new IdEntry(id, attrtype, this.level, this.latest);
+    this.latest = entry;
+  }
 
   // Finds an entry for the given identifier in the identification table,
   // if any. If there are several entries for that identifier, finds the
@@ -118,10 +140,10 @@ public final class IdentificationTable {
    * 
    */
 
-  public Declaration retrieve (String id) {
+  public Object retrieve (String id) {
 
     IdEntry entry;
-    Declaration attr = null;
+    Object attr = null;
     boolean present = false, searching = true;
 
     entry = this.latest;
@@ -131,7 +153,7 @@ public final class IdentificationTable {
       else if (entry.id.equals(id)) {
         present = true;
         searching = false;
-        attr = entry.attr;
+        attr = (entry.attr != null) ? entry.attr : entry.type;
       } else
         entry = entry.previous;
     }

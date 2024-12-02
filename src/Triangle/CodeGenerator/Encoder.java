@@ -1505,6 +1505,27 @@ public Object visitTypeDenoter(TypeDenoter ast, Object o) {
       ast.E.visit(this, frame1);
       // Generate appropriate code for function type denoter
       return Integer.valueOf(0);*/
+      Frame frame = (Frame) o;
+      int jumpAddr = this.nextInstrAddr;
+      int argsSize =0,valSize = 0;
+      this.emit(Machine.JUMPop,0, Machine.CBr, 0);
+      ast.entity = new KnownRoutine(Machine.closureSize, frame.level, this.nextInstrAddr);
+      this.writeTableDetails(ast);
+      if (frame.level == Machine.maxRoutineLevel) {
+        reporter.reportRestriction("can't nest routines more than 7 deep");
+      } else {
+        Frame frame1 = new Frame(frame.level + 1, 0);
+        argsSize = ((Integer) ast.FPS.visit(this, frame1)).intValue();
+        Frame frame2 = new Frame(frame.level + 1, Machine.linkDataSize);
+        valSize = ((Integer) ast.E.visit(this, frame2)).intValue();
+      }
+      this.emit(Machine.RETURNop, valSize, 0, argsSize);
+      this.patch(jumpAddr, this.nextInstrAddr);
+      return Integer.valueOf(0);
+      /* En desuso
+
+
+
       int typeSize = 0; // Puedes ajustar el cálculo del tamaño según tus necesidades
 
       // Visitar la secuencia de parámetros formales
@@ -1526,5 +1547,6 @@ public Object visitTypeDenoter(TypeDenoter ast, Object o) {
       }
 
       return new Integer(typeSize); // Devuelve el tamaño del tipo de la función
+      */
     }
 }

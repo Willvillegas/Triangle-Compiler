@@ -15,6 +15,7 @@
 package Triangle.ContextualAnalyzer;
 
 import Triangle.AbstractSyntaxTrees.Declaration;
+import Triangle.AbstractSyntaxTrees.FieldTypeDenoter;
 
 /**
  * The IdEntry class is used to store the identifiers and their attributes
@@ -37,12 +38,21 @@ public class IdEntry {
 
   protected String id;
   protected Declaration attr;
+  protected FieldTypeDenoter type;
   protected int level;
   protected IdEntry previous;
 
   IdEntry (String id, Declaration attr, int level, IdEntry previous) {
     this.id = id;
     this.attr = attr;
+    this.type = null;
+    this.level = level;
+    this.previous = previous;
+  }
+  IdEntry (String id, FieldTypeDenoter type, int level, IdEntry previous) {
+    this.id = id;
+    this.attr = null;
+    this.type = type;
     this.level = level;
     this.previous = previous;
   }

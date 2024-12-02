@@ -858,7 +858,9 @@ public final class Checker implements Visitor {
   }
   
   public Object visitRecordTypeDenoter(RecordTypeDenoter ast, Object o) {
+    //this.idTable.openScope();
     ast.FT = (FieldTypeDenoter) ast.FT.visit(this, null);
+    //this.idTable.closeScope();
     /*if (ast.FD != null){
         for (var func : ast.FD){
             func.visit(this, null);
@@ -874,6 +876,7 @@ public final class Checker implements Visitor {
 
   public Object visitMultipleFieldTypeDenoter(MultipleFieldTypeDenoter ast, Object o) {
     ast.T = (TypeDenoter) ast.T.visit(this, null);
+    idTable.enterTypeDenoter(ast.I.spelling, ast);
     //Montar una validación de que si es un functypedenoter pase al otro
     /**/
     /*if (ast.T instanceof FuncTypeDenoter){
@@ -886,6 +889,7 @@ public final class Checker implements Visitor {
 
   public Object visitSingleFieldTypeDenoter(SingleFieldTypeDenoter ast, Object o) {
     ast.T = (TypeDenoter) ast.T.visit(this, null);
+    idTable.enterTypeDenoter(ast.I.spelling, ast);
     /*if (ast.T instanceof FuncTypeDenoter){
         ast.T = (TypeDenoter) ast.T.visit(this, null);
     }*/
@@ -898,9 +902,13 @@ public final class Checker implements Visitor {
   }
 
   public Object visitIdentifier(Identifier I, Object o) {
-    Declaration binding = idTable.retrieve(I.spelling);
-    if (binding != null)
-      I.decl = binding;
+    Object binding = idTable.retrieve(I.spelling);
+    if(binding instanceof Declaration && (binding != null)){
+        I.decl = (Declaration) binding;
+    }else if( binding instanceof FieldTypeDenoter && (binding != null)){
+        I.decl = (FieldTypeDenoter) binding;
+    }else//si es nulo entonces que se mantenga nulo y si no entonces que se mantenga en la misma variable
+        I.decl = (I.decl == null) ? null : I.decl;
     return binding;
   }
 
@@ -909,9 +917,10 @@ public final class Checker implements Visitor {
   }
 
   public Object visitOperator(Operator O, Object o) {
-    Declaration binding = idTable.retrieve(O.spelling);
+    var binding = idTable.retrieve(O.spelling);
+
     if (binding != null)
-      O.decl = binding;
+      O.decl = (Declaration)binding;
     return binding;
   }
 
@@ -954,23 +963,27 @@ public final class Checker implements Visitor {
   public Object visitSimpleVname(SimpleVname ast, Object o) {
     ast.variable = false;
     ast.type = StdEnvironment.errorType;
-    Declaration binding = (Declaration) ast.I.visit(this, null);
+    var binding =  ast.I.visit(this, null);
     if (binding == null)
       reportUndeclared(ast.I);
-    else
-      if (binding instanceof ConstDeclaration) {
+    else if (binding instanceof ConstDeclaration) {
         ast.type = ((ConstDeclaration) binding).E.type;
         ast.variable = false;
-      } else if (binding instanceof VarDeclaration) {
+    } else if (binding instanceof VarDeclaration) {
         ast.type = ((VarDeclaration) binding).T;
         ast.variable = true;
-      } else if (binding instanceof ConstFormalParameter) {
+    } else if (binding instanceof ConstFormalParameter) {
         ast.type = ((ConstFormalParameter) binding).T;
         ast.variable = false;
-      } else if (binding instanceof VarFormalParameter) {
+    } else if (binding instanceof VarFormalParameter) {
         ast.type = ((VarFormalParameter) binding).T;
         ast.variable = true;
-      } else
+    } else if (binding instanceof MultipleFieldTypeDenoter){
+        ast.type = ((MultipleFieldTypeDenoter)binding).T;
+        ast.variable = true;
+    } else if (binding instanceof SingleFieldTypeDenoter){
+        ast.type= ((SingleFieldTypeDenoter)binding).T;
+    }else
         reporter.reportError ("\"%\" is not a const or var identifier",
                               ast.I.spelling, ast.I.position);
     return ast.type;
@@ -1218,6 +1231,7 @@ public final class Checker implements Visitor {
         // Verificar la secuencia de parámetros formales
         ast.T = (TypeDenoter) ast.T.visit(this, null);
         ast.FPS.visit(this, null);
+        ast.E.visit(this, null);
         // no se puede debido a que las expresiones locales todavía no están implementadas en al tabla de identificación
         //ast.E.visit(this, null);
         // Verificar el tipo de retorno

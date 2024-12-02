@@ -5,12 +5,12 @@ let
   end;
   var v: Vector;
   var result: Integer;
-  proc hola(x:Integer)~putint(x)
+  func hola(x:Integer):Integer~x+x
 in
   begin
     v.x := 3;
     v.y := 4;
     !result := v.norm()
     !result:= hi(result)
-    hola(4);
+    result := hola(4);
   end

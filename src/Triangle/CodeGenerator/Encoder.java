@@ -545,9 +545,8 @@ public final class Encoder implements Visitor {
     public Object visitCallMethodExpression(CallMethodExpression ast, Object o) {
         Frame frame = (Frame) o;
         Integer valSize = (Integer) ast.type.visit(this, null);
-        ast.APS.visit(this, frame);
-        ast.vN.visit(this, frame);
-        this.emit(Machine.CALLop, Machine.SBr, Machine.CBr,0);
+        Integer argsSize = (Integer) ast.APS.visit(this, frame);
+        ast.I.visit(this, new Frame(frame.level, argsSize));
         return valSize;
     }
     
@@ -636,8 +635,15 @@ public final class Encoder implements Visitor {
 
   public Object visitTypeDeclaration(TypeDeclaration ast, Object o) {
     // just to ensure the type's representation is decided
-    ast.T.visit(this, null);
-    return new Integer(0);
+    Frame frame = (Frame)o;
+    if  (ast.T instanceof RecordTypeDenoter){
+        int size =0;
+        size = ((Integer)ast.T.visit(this, frame)).intValue();
+        return Integer.valueOf(size);
+    }else{
+        ast.T.visit(this, null);
+        return new Integer(0);
+    }
   }
 
   public Object visitUnaryOperatorDeclaration(UnaryOperatorDeclaration ast,
@@ -1033,18 +1039,10 @@ public final class Encoder implements Visitor {
 
   public Object visitRecordTypeDenoter(RecordTypeDenoter ast, Object o) {
     int typeSize;
+    Frame frame = (Frame) o;
+    FieldType transport = new FieldType(new Integer(0),frame);
     if (ast.entity == null) {
-      typeSize = ((Integer) ast.FT.visit(this, new Integer(0))).intValue();
-      if (ast.FD != null){
-        for (var func : ast.FD) {
-            func.visit(this, null);
-        }
-      }
-      if (ast.FD != null){
-        for (var proc : ast.PD) {
-            proc.visit(this, null);
-        }
-      }
+      typeSize = ((Integer) ast.FT.visit(this, transport)).intValue();
       ast.entity = new TypeRepresentation(typeSize);
       writeTableDetails(ast);
     } else
@@ -1055,29 +1053,32 @@ public final class Encoder implements Visitor {
 
   public Object visitMultipleFieldTypeDenoter(MultipleFieldTypeDenoter ast,
 					      Object o) {
-    int offset = ((Integer) o).intValue();
+    FieldType transport= (FieldType)o;
+    int offset = transport.offsettype;//((Integer) o).intValue();
     int fieldSize;
 
     if (ast.entity == null) {
-      fieldSize = ((Integer) ast.T.visit(this, null)).intValue();
+      fieldSize = ((Integer) ast.T.visit(this, transport.frame)).intValue();
       ast.entity = new Field (fieldSize, offset);
       writeTableDetails(ast);
     } else
       fieldSize = ast.entity.size;
 
     Integer offset1 = new Integer(offset + fieldSize);
-    int recSize = ((Integer) ast.FT.visit(this, offset1)).intValue();
+    transport.offsettype = offset1;
+    int recSize = ((Integer) ast.FT.visit(this, transport)).intValue();
     return new Integer(fieldSize + recSize);
   }
 
   @Override
   public Object visitSingleFieldTypeDenoter(SingleFieldTypeDenoter ast,
 					    Object o) {
-    int offset = ((Integer) o).intValue();
+    FieldType transport= (FieldType)o;
+    int offset = transport.offsettype;//((Integer) o).intValue();
     int fieldSize;
 
     if (ast.entity == null) {
-      fieldSize = ((Integer) ast.T.visit(this, null)).intValue();
+      fieldSize = ((Integer) ast.T.visit(this, transport)).intValue();
       ast.entity = new Field (fieldSize, offset);
       writeTableDetails(ast);
     } else
@@ -1505,7 +1506,8 @@ public Object visitTypeDenoter(TypeDenoter ast, Object o) {
       ast.E.visit(this, frame1);
       // Generate appropriate code for function type denoter
       return Integer.valueOf(0);*/
-      Frame frame = (Frame) o;
+      FieldType transport = (FieldType) o;
+      Frame frame = transport.frame;
       int jumpAddr = this.nextInstrAddr;
       int argsSize =0,valSize = 0;
       this.emit(Machine.JUMPop,0, Machine.CBr, 0);

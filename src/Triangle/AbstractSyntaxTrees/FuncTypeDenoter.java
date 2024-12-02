@@ -19,6 +19,7 @@
 package Triangle.AbstractSyntaxTrees;
 
 import Triangle.SyntacticAnalyzer.SourcePosition;
+import java.util.Objects;
 
 public class FuncTypeDenoter extends TypeDenoter {
 
@@ -43,7 +44,24 @@ public class FuncTypeDenoter extends TypeDenoter {
 
     @Override
     public boolean equals(Object obj) {
-        return this.equals(obj);
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final FuncTypeDenoter other = (FuncTypeDenoter) obj;
+        if (!Objects.equals(this.FPS, other.FPS)) {
+            return false;
+        }
+        if (!Objects.equals(this.T, other.T)) {
+            return false;
+        }
+        return Objects.equals(this.E, other.E);
     }
+
   
 }

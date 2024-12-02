@@ -422,7 +422,25 @@ public final class Checker implements Visitor {
         }
         ast.type = recType;
         return ast.type;*/
-        return null;
+        var binding = ast.I.visit(this, null);
+        var recType = ast.vN.visit(this, null);
+        if(binding ==null){
+            reportUndeclared(ast.I);
+            ast.type = StdEnvironment.errorType;
+
+        }else if (! (recType instanceof RecordTypeDenoter)){
+            reporter.reportError("The variable is not a record type", "", ast.position);
+            ast.type = StdEnvironment.errorType;
+        }else if (binding instanceof MultipleFieldTypeDenoter){
+          ast.APS.visit(this, ((FuncTypeDenoter)((MultipleFieldTypeDenoter)binding).T).FPS);
+          ast.type = ((FuncTypeDenoter)((MultipleFieldTypeDenoter)binding).T).T;
+        }else if (binding instanceof SingleFieldTypeDenoter){
+          ast.APS.visit(this, ((FuncTypeDenoter)((SingleFieldTypeDenoter)binding).T).FPS);
+          ast.type = ((FuncTypeDenoter)((SingleFieldTypeDenoter)binding).T).T;
+        }else{
+            reporter.reportError("\"%\" is not a method identifier in a record", ast.I.spelling, ast.I.position);
+        }
+        return ast.type;
     }
   // Declarations
 
@@ -1217,7 +1235,7 @@ public final class Checker implements Visitor {
         ast.T = new AnyTypeDenoter(dummyPos);
         ast.FPS.visit(this, null);
         ast.C.visit(this, null);
-        return ast.T;
+        return ast;
     }
 
     @Override
@@ -1235,6 +1253,6 @@ public final class Checker implements Visitor {
         // no se puede debido a que las expresiones locales todavía no están implementadas en al tabla de identificación
         //ast.E.visit(this, null);
         // Verificar el tipo de retorno
-        return ast.T;
+        return ast;
     }
 }

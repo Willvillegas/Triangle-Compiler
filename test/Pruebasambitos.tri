@@ -13,4 +13,5 @@ in
     !result := v.norm()
     !result:= hi(result)
     result := hola(4);
+    putint(result);
   end

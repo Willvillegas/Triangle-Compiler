@@ -59,12 +59,12 @@ public class Main extends javax.swing.JFrame {
         } catch (Exception e){
             throw e;
         } /*finally {
-            try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());            
-            } catch (Exception e) { }
+            
         }*/
-        
-        
+        /*try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());            
+        } catch (Exception e) { }
+        */
         initComponents();
         setSize(640, 480);
         setVisible(true);

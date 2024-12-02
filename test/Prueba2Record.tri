@@ -2,8 +2,8 @@ let
   type Vector ~ record
     x: Integer,
     y: Integer,
-    norm: func() : Integer ~ x * x + y * y,
-    narma: proc () ~ put(' ')
+    norm: func() : Integer ~ x * x + y * y
+    !narma: proc () ~ put(' ')
   end;
   var v: Vector;
   var result: Integer;
@@ -12,7 +12,7 @@ in
   begin
     v.x := 3;
     v.y := 4;
-    !result := v::norm();
-    result:= hi(result);
+    result := v::norm();
+    !result:= hi(result);
     putint(result)
   end

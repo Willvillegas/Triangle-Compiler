@@ -1,0 +1,9 @@
+let
+	var i : Integer;
+	var j : Char
+in
+begin
+	j:='a';
+	i:= if j='a' then 3 else 4;
+	putint(i)
+end

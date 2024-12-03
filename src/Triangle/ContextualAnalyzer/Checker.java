@@ -609,6 +609,14 @@ public final class Checker implements Visitor {
         else
             used.add(val);
         //visita los demás nodos y valida su tipo
+        /*
+        se busca crear un ifexpression
+        if Eve then E else CA
+         */
+        TypeDenoter e1Type = (TypeDenoter) ast.EvE.visit(this, null);
+        if (! e1Type.equals(StdEnvironment.booleanType))
+          reporter.reportError ("Expression unexpected", "",
+                            ast.EvE.position);
         TypeDenoter eType= (TypeDenoter) ast.E.visit(this, null);
         TypeDenoter caType = (TypeDenoter) ast.CA.visit(this, used);
         if (!eType.equals(caType)){
@@ -628,12 +636,22 @@ public final class Checker implements Visitor {
         else
             used.add(val);
         //visita los demás nodos y valida su tipo
+        //Se buscará en hacerlo como un ifexpression
+        //if Eve then E else CA
+        TypeDenoter e1Type = (TypeDenoter) ast.EvE.visit(this, null);
+        if (! e1Type.equals(StdEnvironment.booleanType))
+          reporter.reportError ("Expression unexpected", "",
+                            ast.EvE.position);
+        TypeDenoter e2Type= (TypeDenoter) ast.E.visit(this, null);
+        TypeDenoter caType = (TypeDenoter) ast.CA.visit(this, used);
+        /*
         TypeDenoter eType= (TypeDenoter) ast.E.visit(this, null);
         TypeDenoter caType = (TypeDenoter) ast.CA.visit(this, used);
-        if (!eType.equals(caType)){
+        */
+        if (!e2Type.equals(caType)){
             reporter.reportError("Incompatible types: ", "", ast.E.position);
         }
-        ast.type = eType;
+        ast.type = e2Type;
         return ast.type;
     }
     /**

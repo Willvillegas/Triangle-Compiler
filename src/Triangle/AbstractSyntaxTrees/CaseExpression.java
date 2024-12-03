@@ -15,6 +15,7 @@
 package Triangle.AbstractSyntaxTrees;
 
 import Triangle.SyntacticAnalyzer.SourcePosition;
+import java.util.Objects;
 /**
  * CaseExpression 
  * Clase principal para la expresion Case en el Triangle Language
@@ -34,4 +35,22 @@ public class CaseExpression extends Expression {
   }
   public Vname Vn;
   public CaseAggregate Ca;
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final CaseExpression other = (CaseExpression) obj;
+        if (!Objects.equals(this.Vn, other.Vn)) {
+            return false;
+        }
+        return Objects.equals(this.Ca, other.Ca);
+    }
+  
 }

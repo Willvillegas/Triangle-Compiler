@@ -7,7 +7,7 @@ let
 in
 
     begin
-    x :='z';
+    x :='e';
     j := case x of
 
         'a' : 43;
@@ -16,7 +16,7 @@ in
 
 	'c' : 5;
 
-	'e' : 20;
+	'e' : (20+5);
 
         else: 100;
     putint(j)

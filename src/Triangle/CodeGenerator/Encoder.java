@@ -468,6 +468,8 @@ public final class Encoder implements Visitor {
         //salida del case
         emit(Machine.POPop, 0, 0, 1);
         return valsize;*/
+
+        /******Codigo que funciona pero quiero probar otro
         Integer valSize= (Integer) 0;
         Frame frame = (Frame) o;
         
@@ -538,6 +540,15 @@ public final class Encoder implements Visitor {
             patch(addr, nextInstrAddr);
         }
         System.out.println(valSize.intValue());
+        return valSize;
+        */
+        Frame frame = (Frame) o;
+        Integer valSize;
+        int jumpifAddr, jumpAddr;
+        ast.type.visit(this, null);
+        /**en duda como este vname visit */
+        ast.Vn.visit(this, frame);
+        valSize = (Integer) ast.Ca.visit(this, frame);
         return valSize;
     }
     
@@ -808,7 +819,24 @@ public final class Encoder implements Visitor {
         // Emitir código para cargar el valor del entero en la pila
         emit(Machine.LOADLop, 0, 0, Integer.parseInt(ast.IL.spelling));
 */
+        /*codigo de prueba para probar algo
         return null;
+        */
+        Frame frame = (Frame) o;
+        Integer valSize;
+        int jumpIfAddr, jumpAddr;
+        ast.type.visit(this, null);
+        ast.EvE.visit(this, frame);
+        jumpIfAddr = nextInstrAddr;
+        emit(Machine.JUMPIFop, Machine.falseRep, Machine.CBr, 0);
+        valSize = (Integer) ast.E.visit(this, frame);
+        jumpAddr = nextInstrAddr;
+        emit(Machine.JUMPop, 0, Machine.CBr, 0);
+        patch(jumpIfAddr, nextInstrAddr);
+        valSize = (Integer) ast.CA.visit(this, frame);
+        patch(jumpAddr, nextInstrAddr);
+        return valSize;
+        
     }
 
     @Override
@@ -837,8 +865,23 @@ public final class Encoder implements Visitor {
         // Emitir código para cargar el valor del carácter en la pila
         emit(Machine.LOADLop, 0, 0, characterValuation(ast.CL.spelling));
         ast.E*/
-
+        /*Comentado para probar algo 
         return null;
+        */
+        Frame frame = (Frame) o;
+        Integer valSize;
+        int jumpIfAddr, jumpAddr;
+        ast.type.visit(this, null);
+        ast.EvE.visit(this, frame);
+        jumpIfAddr = nextInstrAddr;
+        emit(Machine.JUMPIFop, Machine.falseRep,Machine.CBr, 0);
+        valSize = (Integer) ast.E.visit(this, frame);
+        jumpAddr = nextInstrAddr;
+        emit(Machine.JUMPop, 0, Machine.CBr, 0);
+        patch(jumpIfAddr, nextInstrAddr);
+        valSize = (Integer) ast.CA.visit(this, frame);
+        patch(jumpAddr, nextInstrAddr);
+        return valSize;
     }
 
     @Override
@@ -855,7 +898,11 @@ public final class Encoder implements Visitor {
         valSize = (Integer) ast.E.visit(this, frame);
 
         return valSize;*/
-        return null;
+        //return null; comentado para probar algo
+        Frame frame = (Frame) o;
+        Integer valSize;
+        valSize = (Integer) ast.E.visit(this, frame);
+        return valSize;
     }
     // </editor-fold>
 

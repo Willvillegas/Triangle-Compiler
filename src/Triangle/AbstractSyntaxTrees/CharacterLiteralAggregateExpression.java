@@ -24,11 +24,24 @@ public class CharacterLiteralAggregateExpression extends CaseAggregateExpression
     E = cAST;
     CA = caAST;
   }
+  public CharacterLiteralAggregateExpression (Vname vAST,CharacterLiteral clAST, Expression cAST, CaseAggregate caAST, SourcePosition thePosition) {
+    super (thePosition);
+    EvE = new BinaryExpression(
+      new VnameExpression(vAST, thePosition),
+      new Operator("=", thePosition),
+      new CharacterExpression(clAST, thePosition),
+      thePosition
+    );
+    CL = clAST;
+    E = cAST;
+    CA = caAST;
+  }
 
   public Object visit(Visitor v, Object o) {
     return v.visitCharacterLiteralAggregateExpression(this, o);
   }
 
+  public Expression EvE;
   public CharacterLiteral CL;
   public Expression E;
   public CaseAggregate CA;

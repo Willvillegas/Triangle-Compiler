@@ -509,7 +509,7 @@ public class Parser {
         acceptIt();
         Vname vAST = parseVname();
         accept(Token.OF);
-        CaseAggregate caAST = parseCaseAggregateExpression();
+        CaseAggregate caAST = parseCaseAggregateExpression(vAST);
         finish(expressionPos);
         expressionAST = new CaseExpression (vAST,caAST,expressionPos);
     }
@@ -723,7 +723,7 @@ public class Parser {
       }
       return aggregateAST;
   }
-  CaseAggregate parseCaseAggregateExpression() throws SyntaxError {
+  CaseAggregate parseCaseAggregateExpression(Vname vAST) throws SyntaxError {
       CaseAggregate aggregateAST = null; // in case there's a syntactic error
       SourcePosition aggregatePos = new SourcePosition();
       start(aggregatePos);
@@ -732,17 +732,17 @@ public class Parser {
           accept(Token.COLON);
           Expression eAST = parseExpression();
           accept(Token.SEMICOLON);
-          CaseAggregate aAST = parseCaseAggregateExpression();
+          CaseAggregate aAST = parseCaseAggregateExpression(vAST);
           finish(aggregatePos);
-          aggregateAST = new IntegerLiteralAggregateExpression(ilAST, eAST, aAST, aggregatePos);
+          aggregateAST = new IntegerLiteralAggregateExpression(vAST,ilAST, eAST, aAST, aggregatePos);
       } else if (currentToken.kind == Token.CHARLITERAL){
           CharacterLiteral clAST = parseCharacterLiteral();
           accept(Token.COLON);
           Expression eAST = parseExpression();
           accept(Token.SEMICOLON);
-          CaseAggregate aAST = parseCaseAggregateExpression();
+          CaseAggregate aAST = parseCaseAggregateExpression(vAST);
           finish(aggregatePos);
-          aggregateAST = new CharacterLiteralAggregateExpression(clAST, eAST, aAST, aggregatePos);
+          aggregateAST = new CharacterLiteralAggregateExpression(vAST,clAST, eAST, aAST, aggregatePos);
       } else {
           accept(Token.ELSE);
           accept(Token.COLON);

@@ -1,0 +1,10 @@
+let
+	var xx : Integer
+in
+begin
+for xx := 0 to 10 by 2 do
+    begin
+    putint(xx);
+    puteol();
+    end
+end

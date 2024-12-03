@@ -2,9 +2,11 @@ let
 	var xx : Integer
 in
 begin
-for xx := 1 to 10 by 4 do
+for xx := 1 to 10 do!by 4 do
     begin
     putint(xx);
-    put(' ');
-    end
+    puteol();
+    end;
+put(' ');
+putint(1000);
 end

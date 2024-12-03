@@ -34,7 +34,7 @@ Este repositorio tiene una versión extendida del lenguaje tales como:
 
 1. Clone the repository:
     ```sh
-    git clone https://github.com/yourusername/TriangleCompilerIDE.git
+    git clone https://github.com/Willvillegas/Triangle-Compiler.git
     ```
 2. Navega en el directorio del proyecto:
     ```sh

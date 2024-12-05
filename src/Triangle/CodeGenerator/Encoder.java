@@ -385,7 +385,7 @@ public final class Encoder implements Visitor {
   }
 
   public Object visitEmptyExpression(EmptyExpression ast, Object o) {
-    return new Integer(0);
+    return Integer.valueOf(0);
   }
 
   public Object visitIfExpression(IfExpression ast, Object o) {
@@ -567,7 +567,7 @@ public final class Encoder implements Visitor {
   // Declarations
   public Object visitBinaryOperatorDeclaration(BinaryOperatorDeclaration ast,
 					       Object o){
-    return new Integer(0);
+    return Integer.valueOf(0);
   }
 
   public Object visitConstDeclaration(ConstDeclaration ast, Object o) {
@@ -588,7 +588,7 @@ public final class Encoder implements Visitor {
       extraSize = valSize;
     }
     writeTableDetails(ast);
-    return new Integer(extraSize);
+    return Integer.valueOf(extraSize);
   }
 
   public Object visitFuncDeclaration(FuncDeclaration ast, Object o) {
@@ -609,7 +609,7 @@ public final class Encoder implements Visitor {
     }
     emit(Machine.RETURNop, valSize, 0, argsSize);
     patch(jumpAddr, nextInstrAddr);
-    return new Integer(0);
+    return Integer.valueOf(0);
   }
 
   public Object visitProcDeclaration(ProcDeclaration ast, Object o) {
@@ -631,7 +631,7 @@ public final class Encoder implements Visitor {
     }
     emit(Machine.RETURNop, 0, 0, argsSize);
     patch(jumpAddr, nextInstrAddr);
-    return new Integer(0);
+    return Integer.valueOf(0);
   }
 
   public Object visitSequentialDeclaration(SequentialDeclaration ast, Object o) {
@@ -641,7 +641,7 @@ public final class Encoder implements Visitor {
     extraSize1 = ((Integer) ast.D1.visit(this, frame)).intValue();
     Frame frame1 = new Frame (frame, extraSize1);
     extraSize2 = ((Integer) ast.D2.visit(this, frame1)).intValue();
-    return new Integer(extraSize1 + extraSize2);
+    return Integer.valueOf(extraSize1 + extraSize2);
   }
 
   public Object visitTypeDeclaration(TypeDeclaration ast, Object o) {
@@ -653,13 +653,13 @@ public final class Encoder implements Visitor {
         return Integer.valueOf(size);
     }else{
         ast.T.visit(this, null);
-        return new Integer(0);
+        return Integer.valueOf(0);
     }
   }
 
   public Object visitUnaryOperatorDeclaration(UnaryOperatorDeclaration ast,
 					      Object o) {
-    return new Integer(0);
+    return Integer.valueOf(0);
   }
 
   public Object visitVarDeclaration(VarDeclaration ast, Object o) {
@@ -670,7 +670,7 @@ public final class Encoder implements Visitor {
     emit(Machine.PUSHop, 0, 0, extraSize);
     ast.entity = new KnownAddress(Machine.addressSize, frame.level, frame.size);
     writeTableDetails(ast);
-    return new Integer(extraSize);
+    return Integer.valueOf(extraSize);
   }
   // </editor-fold>
 
@@ -682,7 +682,7 @@ public final class Encoder implements Visitor {
     int elemSize = ((Integer) ast.E.visit(this, frame)).intValue();
     Frame frame1 = new Frame(frame, elemSize);
     int arraySize = ((Integer) ast.AA.visit(this, frame1)).intValue();
-    return new Integer(elemSize + arraySize);
+    return Integer.valueOf(elemSize + arraySize);
   }
 
   public Object visitSingleArrayAggregate(SingleArrayAggregate ast, Object o) {
@@ -697,7 +697,7 @@ public final class Encoder implements Visitor {
     int fieldSize = ((Integer) ast.E.visit(this, frame)).intValue();
     Frame frame1 = new Frame (frame, fieldSize);
     int recordSize = ((Integer) ast.RA.visit(this, frame1)).intValue();
-    return new Integer(fieldSize + recordSize);
+    return Integer.valueOf(fieldSize + recordSize);
   }
 
   public Object visitSingleRecordAggregate(SingleRecordAggregate ast,
@@ -912,7 +912,7 @@ public final class Encoder implements Visitor {
     int valSize = ((Integer) ast.T.visit(this, null)).intValue();
     ast.entity = new UnknownValue (valSize, frame.level, -frame.size - valSize);
     writeTableDetails(ast);
-    return new Integer(valSize);
+    return Integer.valueOf(valSize);
   }
 
   public Object visitFuncFormalParameter(FuncFormalParameter ast, Object o) {
@@ -921,7 +921,7 @@ public final class Encoder implements Visitor {
     ast.entity = new UnknownRoutine (Machine.closureSize, frame.level,
 				  -frame.size - argsSize);
     writeTableDetails(ast);
-    return new Integer(argsSize);
+    return Integer.valueOf(argsSize);
   }
 
   public Object visitProcFormalParameter(ProcFormalParameter ast, Object o) {
@@ -930,7 +930,7 @@ public final class Encoder implements Visitor {
     ast.entity = new UnknownRoutine (Machine.closureSize, frame.level,
 				  -frame.size - argsSize);
     writeTableDetails(ast);
-    return new Integer(argsSize);
+    return Integer.valueOf(argsSize);
   }
 
   public Object visitVarFormalParameter(VarFormalParameter ast, Object o) {
@@ -939,13 +939,13 @@ public final class Encoder implements Visitor {
     ast.entity = new UnknownAddress (Machine.addressSize, frame.level,
 				  -frame.size - Machine.addressSize);
     writeTableDetails(ast);
-    return new Integer(Machine.addressSize);
+    return Integer.valueOf(Machine.addressSize);
   }
 
 
   public Object visitEmptyFormalParameterSequence(
 	 EmptyFormalParameterSequence ast, Object o) {
-    return new Integer(0);
+    return Integer.valueOf(0);
   }
 
   public Object visitMultipleFormalParameterSequence(
@@ -954,7 +954,7 @@ public final class Encoder implements Visitor {
     int argsSize1 = ((Integer) ast.FPS.visit(this, frame)).intValue();
     Frame frame1 = new Frame(frame, argsSize1);
     int argsSize2 = ((Integer) ast.FP.visit(this, frame1)).intValue();
-    return new Integer(argsSize1 + argsSize2);
+    return Integer.valueOf(argsSize1 + argsSize2);
   }
 
   public Object visitSingleFormalParameterSequence(
@@ -985,7 +985,7 @@ public final class Encoder implements Visitor {
       emit(Machine.LOADAop, 0, Machine.SBr, 0);
       emit(Machine.LOADAop, 0, Machine.PBr, displacement);
     }
-    return new Integer(Machine.closureSize);
+    return Integer.valueOf(Machine.closureSize);
   }
 
   public Object visitProcActualParameter(ProcActualParameter ast, Object o) {
@@ -1005,18 +1005,18 @@ public final class Encoder implements Visitor {
       emit(Machine.LOADAop, 0, Machine.SBr, 0);
       emit(Machine.LOADAop, 0, Machine.PBr, displacement);
     }
-    return new Integer(Machine.closureSize);
+    return Integer.valueOf(Machine.closureSize);
   }
 
   public Object visitVarActualParameter(VarActualParameter ast, Object o) {
     encodeFetchAddress(ast.V, (Frame) o);
-    return new Integer(Machine.addressSize);
+    return Integer.valueOf(Machine.addressSize);
   }
 
 
   public Object visitEmptyActualParameterSequence(
 	 EmptyActualParameterSequence ast, Object o) {
-    return new Integer(0);
+    return Integer.valueOf(0);
   }
 
   public Object visitMultipleActualParameterSequence(
@@ -1025,7 +1025,7 @@ public final class Encoder implements Visitor {
     int argsSize1 = ((Integer) ast.AP.visit(this, frame)).intValue();
     Frame frame1 = new Frame (frame, argsSize1);
     int argsSize2 = ((Integer) ast.APS.visit(this, frame1)).intValue();
-    return new Integer(argsSize1 + argsSize2);
+    return Integer.valueOf(argsSize1 + argsSize2);
   }
 
   public Object visitSingleActualParameterSequence(
@@ -1036,7 +1036,7 @@ public final class Encoder implements Visitor {
 
   // Type Denoters
   public Object visitAnyTypeDenoter(AnyTypeDenoter ast, Object o) {
-    return new Integer(0);
+    return Integer.valueOf(0);
   }
 
   public Object visitArrayTypeDenoter(ArrayTypeDenoter ast, Object o) {
@@ -1048,7 +1048,7 @@ public final class Encoder implements Visitor {
       writeTableDetails(ast);
     } else
       typeSize = ast.entity.size;
-    return new Integer(typeSize);
+    return Integer.valueOf(typeSize);
   }
 
   public Object visitBoolTypeDenoter(BoolTypeDenoter ast, Object o) {
@@ -1056,7 +1056,7 @@ public final class Encoder implements Visitor {
       ast.entity = new TypeRepresentation(Machine.booleanSize);
       writeTableDetails(ast);
     }
-    return new Integer(Machine.booleanSize);
+    return Integer.valueOf(Machine.booleanSize);
   }
 
   public Object visitCharTypeDenoter(CharTypeDenoter ast, Object o) {
@@ -1064,16 +1064,16 @@ public final class Encoder implements Visitor {
       ast.entity = new TypeRepresentation(Machine.characterSize);
       writeTableDetails(ast);
     }
-    return new Integer(Machine.characterSize);
+    return Integer.valueOf(Machine.characterSize);
   }
 
   public Object visitErrorTypeDenoter(ErrorTypeDenoter ast, Object o) {
-    return new Integer(0);
+    return Integer.valueOf(0);
   }
 
   public Object visitSimpleTypeDenoter(SimpleTypeDenoter ast,
 					   Object o) {
-    return new Integer(0);
+    return Integer.valueOf(0);
   }
 
   public Object visitIntTypeDenoter(IntTypeDenoter ast, Object o) {
@@ -1081,20 +1081,20 @@ public final class Encoder implements Visitor {
       ast.entity = new TypeRepresentation(Machine.integerSize);
       writeTableDetails(ast);
     }
-    return new Integer(Machine.integerSize);
+    return Integer.valueOf(Machine.integerSize);
   }
 
   public Object visitRecordTypeDenoter(RecordTypeDenoter ast, Object o) {
     int typeSize;
     Frame frame = (Frame) o;
-    FieldType transport = new FieldType(new Integer(0),frame);
+    FieldType transport = new FieldType(Integer.valueOf(0),frame);
     if (ast.entity == null) {
       typeSize = ((Integer) ast.FT.visit(this, transport)).intValue();
       ast.entity = new TypeRepresentation(typeSize);
       writeTableDetails(ast);
     } else
       typeSize = ast.entity.size;
-    return new Integer(typeSize);
+    return Integer.valueOf(typeSize);
   }
 
 
@@ -1111,10 +1111,10 @@ public final class Encoder implements Visitor {
     } else
       fieldSize = ast.entity.size;
 
-    Integer offset1 = new Integer(offset + fieldSize);
+    Integer offset1 = Integer.valueOf(offset + fieldSize);
     transport.offsettype = offset1;
     int recSize = ((Integer) ast.FT.visit(this, transport)).intValue();
-    return new Integer(fieldSize + recSize);
+    return Integer.valueOf(fieldSize + recSize);
   }
 
   @Override
@@ -1131,7 +1131,7 @@ public final class Encoder implements Visitor {
     } else
       fieldSize = ast.entity.size;
 
-    return new Integer(fieldSize);
+    return Integer.valueOf(fieldSize);
   }
 
 

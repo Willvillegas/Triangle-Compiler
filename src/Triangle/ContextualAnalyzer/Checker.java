@@ -26,7 +26,6 @@ import Triangle.AbstractSyntaxTrees.BoolTypeDenoter;
 import Triangle.AbstractSyntaxTrees.CallCommand;
 import Triangle.AbstractSyntaxTrees.CallExpression;
 import Triangle.AbstractSyntaxTrees.CaseCommand;
-import Triangle.AbstractSyntaxTrees.CaseAggregate;
 import Triangle.AbstractSyntaxTrees.CaseExpression;
 import Triangle.AbstractSyntaxTrees.CharTypeDenoter;
 import Triangle.AbstractSyntaxTrees.CharacterExpression;
@@ -408,20 +407,6 @@ public final class Checker implements Visitor {
     
     @Override
     public Object visitCallMethodExpression(CallMethodExpression ast, Object o) {
-        /*TypeDenoter recType =(TypeDenoter) ast.vN.visit(this, null);
-        if(! (recType instanceof RecordTypeDenoter)){
-            reporter.reportError("The variable is not a record type", "", ast.position);
-            return null;
-        }
-        
-        var record = (RecordTypeDenoter) recType;
-        //Declaration methodDecl = record.findMethod(ast.I);
-        if (methodDecl == null) {
-            reporter.reportError("The method \"" + ast.I.spelling + "\" is not defined in the record", "", ast.position);
-            return null;
-        }
-        ast.type = recType;
-        return ast.type;*/
         var binding = ast.I.visit(this, null);
         var recType = ast.vN.visit(this, null);
         if(binding ==null){
@@ -894,19 +879,7 @@ public final class Checker implements Visitor {
   }
   
   public Object visitRecordTypeDenoter(RecordTypeDenoter ast, Object o) {
-    //this.idTable.openScope();
     ast.FT = (FieldTypeDenoter) ast.FT.visit(this, null);
-    //this.idTable.closeScope();
-    /*if (ast.FD != null){
-        for (var func : ast.FD){
-            func.visit(this, null);
-        }
-    }
-    if (ast.PD != null){
-        for (var proc : ast.PD){
-            proc.visit(this, null);
-        }
-    }*/
     return ast;
   }
 
@@ -1258,18 +1231,11 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitFuncTypeDenoter(FuncTypeDenoter ast, Object o) {
-        /*ast.T= (TypeDenoter) ast.T.visit(this, null);
-        //this.idTable.enter("", ast);
-        this.idTable.openScope();
-        ast.FPS.visit(this, null);
-        ast.E.visit(this, null);
-        this.idTable.closeScope();*/
+        
         // Verificar la secuencia de parámetros formales
         ast.T = (TypeDenoter) ast.T.visit(this, null);
         ast.FPS.visit(this, null);
         ast.E.visit(this, null);
-        // no se puede debido a que las expresiones locales todavía no están implementadas en al tabla de identificación
-        //ast.E.visit(this, null);
         // Verificar el tipo de retorno
         return ast;
     }

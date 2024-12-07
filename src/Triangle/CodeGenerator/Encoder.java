@@ -59,6 +59,7 @@ import Triangle.AbstractSyntaxTrees.ForCommand;
 import Triangle.AbstractSyntaxTrees.FuncActualParameter;
 import Triangle.AbstractSyntaxTrees.FuncDeclaration;
 import Triangle.AbstractSyntaxTrees.FuncFormalParameter;
+import Triangle.AbstractSyntaxTrees.FuncRecordMethod;
 import Triangle.AbstractSyntaxTrees.FuncTypeDenoter;
 import Triangle.AbstractSyntaxTrees.Identifier;
 import Triangle.AbstractSyntaxTrees.IfCommand;
@@ -1553,7 +1554,13 @@ public Object visitTypeDenoter(TypeDenoter ast, Object o) {
       ast.E.visit(this, frame1);
       // Generate appropriate code for function type denoter
       return Integer.valueOf(0);*/
+      
+      //**********
       FieldType transport = (FieldType) o;
+      int valsize = ((Integer)ast.RM.visit(this,transport)).intValue();
+      return Integer.valueOf(valsize);
+      //**********
+      /*FieldType transport = (FieldType) o;
       Frame frame = transport.frame;
       int jumpAddr = this.nextInstrAddr;
       int argsSize =0,valSize = 0;
@@ -1597,5 +1604,27 @@ public Object visitTypeDenoter(TypeDenoter ast, Object o) {
 
       return new Integer(typeSize); // Devuelve el tamaño del tipo de la función
       */
+    }
+
+    @Override
+    public Object visitFuncRecordMethod(FuncRecordMethod ast, Object o) {
+        FieldType transport = (FieldType) o;
+        Frame frame = transport.frame;
+        int jumpAddr = nextInstrAddr;
+        int argsSize = 0, valSize = 0;
+        emit(Machine.JUMPop, 0, Machine.CBr, 0);
+        ast.entity = new KnownRoutine(Machine.closureSize, frame.level, nextInstrAddr);
+        writeTableDetails(ast);
+        if (frame.level == Machine.maxRoutineLevel)
+            reporter.reportRestriction("can't nest routines more than 7 deep");
+        else {
+            Frame frame1 = new Frame(frame.level + 1, 0);
+            argsSize = ((Integer) ast.FPS.visit(this, frame1)).intValue();
+            Frame frame2 = new Frame(frame.level + 1, Machine.linkDataSize);
+            valSize = ((Integer) ast.E.visit(this, frame2)).intValue();
+        }
+        emit(Machine.RETURNop, valSize, 0, argsSize);
+        patch(jumpAddr, nextInstrAddr);
+        return Integer.valueOf(transport.offsettype);
     }
 }

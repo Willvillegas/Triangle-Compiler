@@ -1,5 +1,5 @@
 /*
- * @(#)IdentificationTable.java                2.1 2003/10/07
+ * @(#)IdentificationRecordTable.java                2.1 2003/10/07
  *
  * Copyright (C) 1999, 2003 D.A. Watt and D.F. Brown
  * Dept. of Computing Science, University of Glasgow, Glasgow G12 8QQ Scotland
@@ -14,7 +14,6 @@
 
 package Triangle.ContextualAnalyzer;
 
-import Triangle.AbstractSyntaxTrees.Declaration;
 import Triangle.AbstractSyntaxTrees.FieldTypeDenoter;
 /**
  * The IdentificationTable class is used to store the identifiers and their attributes
@@ -38,12 +37,12 @@ import Triangle.AbstractSyntaxTrees.FieldTypeDenoter;
  * If there are several entries for that identifier, finds the entry at the highest level, in accordance with the scope rules.
  * Returns null iff no entry is found, otherwise returns the attribute field of the entry found.
  */
-public final class IdentificationTable {
+public final class IdentificationRecordTable {
 
   private int level;
   private IdEntry latest;
 
-  public IdentificationTable () {
+  public IdentificationRecordTable () {
     level = 0;
     latest = null;
   }
@@ -84,7 +83,8 @@ public final class IdentificationTable {
   // duplicated is set to to true iff there is already an entry for the
   // same identifier at the current level.
 
-  public void enter (String id, Declaration attr) {
+
+  public void enter (String id, FieldTypeDenoter attrtype) {
 
     IdEntry entry = this.latest;
     boolean present = false, searching = true;
@@ -99,10 +99,10 @@ public final class IdentificationTable {
        } else
        entry = entry.previous;
     }
-
-    attr.duplicated = present;
+    //no valida la duplicidad de los fieldrecords
+    //attr.duplicated = present;
     // Add new entry ...
-    entry = new IdEntry(id, attr, this.level, this.latest);
+    entry = new IdEntry(id, attrtype, this.level, this.latest);
     this.latest = entry;
   }
 
@@ -119,10 +119,10 @@ public final class IdentificationTable {
    * 
    */
 
-  public Declaration retrieve (String id) {
+  public FieldTypeDenoter retrieve (String id) {
 
     IdEntry entry;
-    Declaration attr = null;
+    FieldTypeDenoter attr = null;
     boolean present = false, searching = true;
 
     entry = this.latest;
@@ -132,7 +132,7 @@ public final class IdentificationTable {
       else if (entry.id.equals(id)) {
         present = true;
         searching = false;
-        attr = entry.attr;
+        attr = entry.type;
       } else
         entry = entry.previous;
     }

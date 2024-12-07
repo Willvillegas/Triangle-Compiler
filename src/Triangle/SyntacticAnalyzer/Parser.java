@@ -95,6 +95,7 @@ import Triangle.AbstractSyntaxTrees.IntegerLiteralAggregateExpression;
 import Triangle.AbstractSyntaxTrees.CharacterLiteralAggregateExpression;
 import Triangle.AbstractSyntaxTrees.ElseCaseAggregateExpression;
 import Triangle.AbstractSyntaxTrees.CallMethodExpression;
+import Triangle.AbstractSyntaxTrees.FuncRecordMethod;
 import Triangle.AbstractSyntaxTrees.FuncTypeDenoter;
 import Triangle.AbstractSyntaxTrees.ProcTypeDenoter;
 import java.util.ArrayList;
@@ -1262,15 +1263,9 @@ public class Parser {
     
     case Token.FUNC :{
         this.acceptIt();
-        accept(Token.LPAREN);
-        FormalParameterSequence fpsAST = parseFormalParameterSequence();
-        accept(Token.RPAREN);
-        accept(Token.COLON);
-        TypeDenoter tdAST = parseTypeDenoter();
-        accept(Token.IS);
-        Expression eAST = parseExpression();
+        var rmAST = parseFuncRecordMethod();
         finish(typePos);
-        typeAST = new FuncTypeDenoter(fpsAST,tdAST,eAST,typePos);
+        typeAST = new FuncTypeDenoter(rmAST,typePos);//FuncTypeDenoter(fpsAST,tdAST,eAST,typePos);
     }
     break;
     
@@ -1345,4 +1340,20 @@ public class Parser {
       fdAST = new FuncDeclaration(iast,fpsAST,tAST,eAST,declarationPos);
       return fdAST;
   }*/
+  
+  FuncRecordMethod parseFuncRecordMethod() throws SyntaxError{
+      FuncRecordMethod frmAST = null;
+      SourcePosition funcPos = new SourcePosition();
+      start(funcPos);
+      accept(Token.LPAREN);
+      FormalParameterSequence fpsAST = parseFormalParameterSequence();
+      accept(Token.RPAREN);
+      accept(Token.COLON);
+      TypeDenoter tdAST = parseTypeDenoter();
+      accept(Token.IS);
+      Expression eAST = parseExpression();
+      this.finish(funcPos);
+      frmAST = new FuncRecordMethod(fpsAST,tdAST,eAST,funcPos);
+      return frmAST;
+  }
 }

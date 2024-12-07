@@ -93,6 +93,7 @@ import Triangle.AbstractSyntaxTrees.ElseCaseAggregate;
 import Triangle.AbstractSyntaxTrees.IntegerLiteralAggregateExpression;
 import Triangle.AbstractSyntaxTrees.CharacterLiteralAggregateExpression;
 import Triangle.AbstractSyntaxTrees.ElseCaseAggregateExpression;
+import Triangle.AbstractSyntaxTrees.FuncRecordMethod;
 import Triangle.AbstractSyntaxTrees.FuncTypeDenoter;
 import Triangle.AbstractSyntaxTrees.ProcTypeDenoter;
 
@@ -634,7 +635,12 @@ public class LayoutVisitor implements Visitor {
 
     @Override
     public Object visitFuncTypeDenoter(FuncTypeDenoter ast, Object o) {
-        return this.layoutTernary("FuncTypeD", ast.T, ast.FPS, ast.E);
+        return this.layoutUnary("FuncTypeD", ast.RM);
+    }
+
+    @Override
+    public Object visitFuncRecordMethod(FuncRecordMethod ast, Object o) {
+        return this.layoutTernary("Method", ast.FPS, ast.T, ast.E);
     }
 
 }

@@ -99,8 +99,10 @@ import Triangle.AbstractSyntaxTrees.WhileCommand;
 import Triangle.SyntacticAnalyzer.SourcePosition;
 import java.util.ArrayList;
 import Triangle.AbstractSyntaxTrees.CallMethodExpression;
+import Triangle.AbstractSyntaxTrees.FuncRecordMethod;
 import Triangle.AbstractSyntaxTrees.FuncTypeDenoter;
 import Triangle.AbstractSyntaxTrees.ProcTypeDenoter;
+import Triangle.AbstractSyntaxTrees.RecordMethod;
 
 public final class Checker implements Visitor {
 
@@ -417,11 +419,11 @@ public final class Checker implements Visitor {
             reporter.reportError("The variable is not a record type", "", ast.position);
             ast.type = StdEnvironment.errorType;
         }else if (binding instanceof MultipleFieldTypeDenoter){
-          ast.APS.visit(this, ((FuncTypeDenoter)((MultipleFieldTypeDenoter)binding).T).FPS);
-          ast.type = ((FuncTypeDenoter)((MultipleFieldTypeDenoter)binding).T).T;
+          ast.APS.visit(this, ((FuncRecordMethod)((FuncTypeDenoter)((MultipleFieldTypeDenoter)binding).T).RM).FPS);
+          ast.type = ((FuncRecordMethod)((FuncTypeDenoter)((MultipleFieldTypeDenoter)binding).T).RM).T;
         }else if (binding instanceof SingleFieldTypeDenoter){
-          ast.APS.visit(this, ((FuncTypeDenoter)((SingleFieldTypeDenoter)binding).T).FPS);
-          ast.type = ((FuncTypeDenoter)((SingleFieldTypeDenoter)binding).T).T;
+          ast.APS.visit(this, ((FuncRecordMethod)((FuncTypeDenoter)((SingleFieldTypeDenoter)binding).T).RM).FPS);
+          ast.type = ((FuncRecordMethod)((FuncTypeDenoter)((SingleFieldTypeDenoter)binding).T).RM).T;
         }else{
             reporter.reportError("\"%\" is not a method identifier in a record", ast.I.spelling, ast.I.position);
         }
@@ -884,24 +886,52 @@ public final class Checker implements Visitor {
   }
 
   public Object visitMultipleFieldTypeDenoter(MultipleFieldTypeDenoter ast, Object o) {
-    ast.T = (TypeDenoter) ast.T.visit(this, null);
-    idTable.enterTypeDenoter(ast.I.spelling, ast);
+    //ast.T = (TypeDenoter) ast.T.visit(this, null);
+    //idTable.enterTypeDenoter(ast.I.spelling, ast);
     //Montar una validación de que si es un functypedenoter pase al otro
     /**/
     /*if (ast.T instanceof FuncTypeDenoter){
         ast.T = (TypeDenoter) ast.T.visit(this, null);
     }*/
+    /**
+     * Si queremos solo declararlo entonces hacemos
+     */
+    var binding = (Object)ast.T.visit(this, null);
+    idRecordTable.enter(ast.I.spelling,ast);
+    if (binding instanceof FuncTypeDenoter){
+        //se va a crear una tabla exclusiva para los record
+        
+        //if (ast.duplicated)
+        //reporter.reportError ("identifier \"%\" already declared",
+                            //ast.I.spelling, ast.position);
+        ast.T = null;
+    }else{
+        ast.T = (TypeDenoter)binding;
+    }
     
     ast.FT.visit(this, null);
     return ast;
   }
 
   public Object visitSingleFieldTypeDenoter(SingleFieldTypeDenoter ast, Object o) {
-    ast.T = (TypeDenoter) ast.T.visit(this, null);
-    idTable.enterTypeDenoter(ast.I.spelling, ast);
+    //ast.T = (TypeDenoter) ast.T.visit(this, null);
+    //idTable.enterTypeDenoter(ast.I.spelling, ast);
     /*if (ast.T instanceof FuncTypeDenoter){
         ast.T = (TypeDenoter) ast.T.visit(this, null);
     }*/
+    /**
+     * Si queremos solo declararlo entonces hacemos
+     */
+    var binding = (Object)ast.T.visit(this, null);
+    idRecordTable.enter(ast.I.spelling,ast);
+    if (binding instanceof FuncTypeDenoter){
+        //se va a crear una tabla exclusiva para los record
+        
+        ast.T = (TypeDenoter)binding;
+    }else{
+        ast.T = (TypeDenoter)binding;
+    }
+    
     return ast;
   }
 
@@ -912,6 +942,9 @@ public final class Checker implements Visitor {
 
   public Object visitIdentifier(Identifier I, Object o) {
     Object binding = idTable.retrieve(I.spelling);
+    if (binding == null){
+        binding= this.idRecordTable.retrieve(I.spelling);
+    }
     if(binding instanceof Declaration && (binding != null)){
         I.decl = (Declaration) binding;
     }else if( binding instanceof FieldTypeDenoter && (binding != null)){
@@ -987,11 +1020,12 @@ public final class Checker implements Visitor {
     } else if (binding instanceof VarFormalParameter) {
         ast.type = ((VarFormalParameter) binding).T;
         ast.variable = true;
-    } else if (binding instanceof MultipleFieldTypeDenoter){
-        ast.type = ((MultipleFieldTypeDenoter)binding).T;
+    } else if (binding instanceof MultipleFieldTypeDenoter mfTD){
+        ast.type = mfTD.T;//((FuncRecordMethod)((FuncTypeDenoter)mfTD.T).RM).T;
         ast.variable = true;
-    } else if (binding instanceof SingleFieldTypeDenoter){
-        ast.type= ((SingleFieldTypeDenoter)binding).T;
+    } else if (binding instanceof SingleFieldTypeDenoter sfTD){
+        ast.type= ((FuncRecordMethod)((FuncTypeDenoter)sfTD.T).RM).T;
+        ast.variable = true;
     }else
         reporter.reportError ("\"%\" is not a const or var identifier",
                               ast.I.spelling, ast.I.position);
@@ -1040,10 +1074,12 @@ public final class Checker implements Visitor {
   public Checker (ErrorReporter reporter) {
     this.reporter = reporter;
     this.idTable = new IdentificationTable ();
+    this.idRecordTable = new IdentificationRecordTable ();
     establishStdEnvironment();
   }
 
   private IdentificationTable idTable;
+  private IdentificationRecordTable idRecordTable;
   private static SourcePosition dummyPos = new SourcePosition();
   private ErrorReporter reporter;
 
@@ -1231,12 +1267,20 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitFuncTypeDenoter(FuncTypeDenoter ast, Object o) {
-        
-        // Verificar la secuencia de parámetros formales
-        ast.T = (TypeDenoter) ast.T.visit(this, null);
-        ast.FPS.visit(this, null);
-        ast.E.visit(this, null);
-        // Verificar el tipo de retorno
+        ast.RM.visit(this, null);
         return ast;
+    }
+
+    @Override
+    public Object visitFuncRecordMethod(FuncRecordMethod ast, Object o) {
+    
+    ast.T = (TypeDenoter) ast.T.visit(this, null);
+    idRecordTable.openScope();
+    ast.FPS.visit(this, null);
+    TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
+    idRecordTable.closeScope();
+    if (! ast.T.equals(eType))
+      reporter.reportError ("body of function  has wrong type","", ast.E.position);
+        return null;
     }
 }

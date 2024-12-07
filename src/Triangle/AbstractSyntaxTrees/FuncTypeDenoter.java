@@ -23,13 +23,9 @@ import java.util.Objects;
 
 public class FuncTypeDenoter extends TypeDenoter {
 
-  public FuncTypeDenoter (FormalParameterSequence fpsAST,
-  		   TypeDenoter tAST, Expression eAST,
-                   SourcePosition thePosition) {
+  public FuncTypeDenoter (FuncRecordMethod frmAST, SourcePosition thePosition) {
     super (thePosition);
-    FPS = fpsAST;
-    T = tAST;
-    E = eAST;
+    this.RM=frmAST;
   }
   
 
@@ -38,9 +34,7 @@ public class FuncTypeDenoter extends TypeDenoter {
   }
 
   
-  public FormalParameterSequence FPS;
-  public TypeDenoter T;
-  public Expression E;
+  public FuncRecordMethod RM;
 
     @Override
     public boolean equals(Object obj) {
@@ -54,14 +48,7 @@ public class FuncTypeDenoter extends TypeDenoter {
             return false;
         }
         final FuncTypeDenoter other = (FuncTypeDenoter) obj;
-        if (!Objects.equals(this.FPS, other.FPS)) {
-            return false;
-        }
-        if (!Objects.equals(this.T, other.T)) {
-            return false;
-        }
-        return Objects.equals(this.E, other.E);
+        return Objects.equals(this.RM, other.RM);
     }
-
   
 }

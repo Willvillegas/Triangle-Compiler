@@ -38,6 +38,7 @@ import Triangle.AbstractSyntaxTrees.ForCommand;
 import Triangle.AbstractSyntaxTrees.FuncActualParameter;
 import Triangle.AbstractSyntaxTrees.FuncDeclaration;
 import Triangle.AbstractSyntaxTrees.FuncFormalParameter;
+import Triangle.AbstractSyntaxTrees.FuncRecordMethod;
 import Triangle.AbstractSyntaxTrees.FuncTypeDenoter;
 import Triangle.AbstractSyntaxTrees.Identifier;
 import Triangle.AbstractSyntaxTrees.IfCommand;
@@ -771,6 +772,12 @@ public class TableVisitor implements Visitor {
 
     @Override
     public Object visitFuncTypeDenoter(FuncTypeDenoter ast, Object o) {
+        ast.RM.visit(this, null);
+        return null;
+    }
+
+    @Override
+    public Object visitFuncRecordMethod(FuncRecordMethod ast, Object o) {
         ast.FPS.visit(this, null);
         ast.T.visit(this, null);
         ast.E.visit(this, null);

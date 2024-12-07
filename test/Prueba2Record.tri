@@ -12,7 +12,7 @@ in
   begin
     v.x := 3;
     v.y := 4;
-    result := v::norm();
+    !result := v::norm();
     !result:= hi(result);
     putint(result)
   end
